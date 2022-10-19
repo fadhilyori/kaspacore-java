@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DataStream" type="Application" factoryName="Application" nameIsGenerated="true" show_console_on_std_err="true" show_console_on_std_out="true">
+    <option name="ALTERNATIVE_JRE_PATH" value="19" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="MAIN_CLASS_NAME" value="org.mataelang.kaspacore.DataStream" />
+    <module name="kaspa-core-system-java" />
+    <option name="VM_PARAMETERS" value="--add-exports java.base/sun.nio.ch=ALL-UNNAMED" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.mataelang.kaspacore.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
