@@ -6,13 +6,24 @@
 
     <groupId>org.mataelang</groupId>
     <artifactId>kaspacore</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>19</maven.compiler.source>
+        <maven.compiler.target>19</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>Maven Central</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>Confluent</id>
+            <url>https://packages.confluent.io/maven</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
@@ -73,6 +84,21 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>3.3.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.confluent/kafka-json-schema-serializer -->
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-json-schema-serializer</artifactId>
+            <version>7.2.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

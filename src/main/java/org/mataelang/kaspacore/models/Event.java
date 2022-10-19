@@ -53,7 +53,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "timestamp"
 })
 @Generated("jsonschema2pojo")
-public class Event implements Serializable
+public class Event implements Serializable, EventRepository
 {
 
     @JsonProperty("seconds")

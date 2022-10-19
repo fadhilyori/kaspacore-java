@@ -3,53 +3,53 @@ package org.mataelang.kaspacore;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
-import org.apache.spark.SparkConf;
 import org.apache.spark.TaskContext;
-import org.apache.spark.streaming.Durations;
-import org.apache.spark.streaming.api.java.JavaInputDStream;
-import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.kafka010.*;
 import org.mataelang.kaspacore.providers.Consumer;
 import org.mataelang.kaspacore.providers.Producer;
-import org.mataelang.kaspacore.utils.ConfigLoader;
+import org.mataelang.kaspacore.providers.Spark;
+
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class DataStream {
+    private static final Pattern SPACE = Pattern.compile(" ");
     public static void main(String[] args) throws InterruptedException {
         Logger log = Logger.getLogger(DataStream.class.getName());
-        ConfigLoader config = new ConfigLoader();
 
-        SparkConf sparkConf = new SparkConf();
-        sparkConf.setAppName(config.getString("applicationName"));
-        sparkConf.setMaster(config.getString("sparkMaster"));
+//        JavaDStream<String> lines =
+//                Consumer.getInstance().getStream(Spark.getStreamingContext()).map(ConsumerRecord::value);
+//        JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(Arrays.stream(SPACE.split(x)).iterator()));
 
-        JavaStreamingContext streamingContext = new JavaStreamingContext(sparkConf, Durations.seconds(1));
-
-        Consumer consumer = new Consumer();
-
-        JavaInputDStream<ConsumerRecord<String, String>> stream = consumer.createStream(streamingContext);
-
-        stream.foreachRDD(rdd -> {
+        Consumer.getInstance().getStream(Spark.getStreamingContext()).foreachRDD(rdd -> {
             OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
 
+
+
             rdd.foreachPartition(recordIterator -> {
-                Producer producer = new Producer();
-                producer.connect();
+                Producer.getInstance().connect();
 
                 OffsetRange o = offsetRanges[TaskContext.get().partitionId()];
-                log.debug(o.topic() + " " + o.partition() + " " + o.fromOffset() + " " + o.untilOffset());
-
-                // TODO: data processing
+//                log.debug(o.topic() + " " + o.partition() + " " + o.fromOffset() + " " + o.untilOffset());
 
                 // send to kafka
-                recordIterator.forEachRemaining(message -> producer.send(message.value()));
+                recordIterator.forEachRemaining(message -> {
+                    // TODO: Convert json to object
 
-                producer.close();
+                    // TODO: data processing
+
+                    Producer.getInstance().send(message.value());
+                });
+
+                Producer.getInstance().close();
             });
 
-            ((CanCommitOffsets) stream.inputDStream()).commitAsync(offsetRanges);
+            ((CanCommitOffsets) Consumer.getInstance().getStream(Spark.getStreamingContext()).inputDStream()).commitAsync(offsetRanges);
         });
 
-        streamingContext.start();
-        streamingContext.awaitTermination();
+        Spark.getStreamingContext().start();
+        Spark.getStreamingContext().awaitTermination();
     }
 }
