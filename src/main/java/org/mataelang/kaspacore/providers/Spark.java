@@ -14,6 +14,7 @@ public class Spark {
             sparkConf = new SparkConf();
             sparkConf.setAppName(PropertyManager.getInstance().getProperty("applicationName"));
             sparkConf.setMaster(PropertyManager.getInstance().getProperty("sparkMaster"));
+            sparkConf.validateSettings();
         }
 
         if (streamingContext == null) {

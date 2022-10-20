@@ -36,7 +36,6 @@ public class DataStream {
 
                 // send to kafka
                 recordIterator.forEachRemaining(message -> {
-                    // TODO: Convert json to object
 
                     // TODO: data processing
 

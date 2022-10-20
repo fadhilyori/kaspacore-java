@@ -6,6 +6,7 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
 import org.apache.spark.streaming.kafka010.LocationStrategies;
+import org.mataelang.kaspacore.models.TestObject;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
 import java.util.Collections;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 public class Consumer {
     private static Consumer instance;
-    private static JavaInputDStream<ConsumerRecord<String, String>> stream;
+    private static JavaInputDStream<ConsumerRecord<String, TestObject>> stream;
     protected static String topic;
     protected static Map<String, Object> config;
     public Consumer() {
@@ -45,7 +46,7 @@ public class Consumer {
         return config;
     }
 
-    public JavaInputDStream<ConsumerRecord<String, String>> getStream(JavaStreamingContext javaStreamingContext) {
+    public JavaInputDStream<ConsumerRecord<String, TestObject>> getStream(JavaStreamingContext javaStreamingContext) {
         if (stream == null) {
             stream = KafkaUtils
                     .createDirectStream(
