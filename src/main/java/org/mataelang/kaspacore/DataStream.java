@@ -26,8 +26,6 @@ public class DataStream {
         Consumer.getInstance().getStream(Spark.getStreamingContext()).foreachRDD(rdd -> {
             OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
 
-
-
             rdd.foreachPartition(recordIterator -> {
                 Producer.getInstance().connect();
 
@@ -36,8 +34,11 @@ public class DataStream {
 
                 // send to kafka
                 recordIterator.forEachRemaining(message -> {
+                    // TODO: src_addr
+                    // TODO: lookup ip addr with maxmind geoip
+                    // TODO: add the value with src_country_code key into the record
 
-                    // TODO: data processing
+                    // TODO: send to kafka
 
                     Producer.getInstance().send(message.value());
                 });
