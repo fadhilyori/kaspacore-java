@@ -33,7 +33,6 @@ public class Stream {
         StructType schema = new StructType(new StructField[]{
                 new StructField("seconds", DataTypes.TimestampType, false, Metadata.empty()),
                 new StructField("name", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("b64_data", DataTypes.StringType, true, Metadata.empty())
         });
 
         Dataset<Row> valueDF =
@@ -43,7 +42,7 @@ public class Stream {
                         functions.col("timestamp")
                 ).select(functions.col("parsed_value.*"), functions.col("timestamp"));
 
-        Dataset<Row> event30s = Functions.aggregate(valueDF, Arrays.asList("src_ip", "sensor_id"), "1 minute", "30 " +
+        Dataset<Row> event30s = Functions.aggregate(valueDF, Arrays.asList("name"), "1 minute", "30 " +
                 "seconds");
 
         event30s.writeStream()
