@@ -34,13 +34,8 @@ public class Functions {
 
     private static List<Column> addGetColumn(List<String> fields, Column newColumn) {
         List<Column> newFields = fields.stream().map(Column::new).collect(Collectors.toList());
-        ;
         newFields.add(newColumn);
 
         return newFields;
     }
-    /**
-     * string { "seconds", "name" }
-     * Column { Column("second"), Column("name") }
-     */
 }
