@@ -8,7 +8,10 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.mataelang.kaspacore.utils.Functions;
 import org.mataelang.kaspacore.utils.PropertyManager;
+
+import java.util.Arrays;
 
 public class Stream {
     public static void main(String[] args) throws Exception {
@@ -27,7 +30,7 @@ public class Stream {
                 .option("subscribe", PropertyManager.getInstance().getProperty("inputTopic"))
                 .load();
 
-        StructType schema = new StructType(new StructField[] {
+        StructType schema = new StructType(new StructField[]{
                 new StructField("seconds", DataTypes.TimestampType, false, Metadata.empty()),
                 new StructField("name", DataTypes.StringType, true, Metadata.empty()),
                 new StructField("b64_data", DataTypes.StringType, true, Metadata.empty())
@@ -36,30 +39,14 @@ public class Stream {
         Dataset<Row> valueDF =
                 rowDataset.select(
                         functions.from_json(functions.col("value").cast("string"), schema).alias(
-                        "parsed_value"),
+                                "parsed_value"),
                         functions.col("timestamp")
                 ).select(functions.col("parsed_value.*"), functions.col("timestamp"));
 
-//        Dataset<Person> personDataset = rowDataset.as(ExpressionEncoder.javaBean(Person.class));
+        Dataset<Row> event30s = Functions.aggregate(valueDF, Arrays.asList("src_ip", "sensor_id"), "1 minute", "30 " +
+                "seconds");
 
-        Dataset<Row> windowedCount = valueDF
-                .withWatermark("seconds", "1 minutes")
-                .groupBy(
-                        functions.window(valueDF.col("seconds"), "30 seconds"),
-//                        functions.session_window(functions.col("seconds"), "1 minute"),
-//                        valueDF.col("name"),
-                        valueDF.col("src_ip"),
-                        valueDF.col("sensor_id")
-//                        valueDF.col("age")
-                ).count();
-
-        Dataset<Row> event10s = windowedCount.select(
-                functions.col("window.start").alias("seconds"),
-                functions.col("name"),
-                functions.col("count")
-        );
-
-        event10s.writeStream()
+        event30s.writeStream()
                 .outputMode("complete")
                 .format("console")
                 .option("truncate", false)
