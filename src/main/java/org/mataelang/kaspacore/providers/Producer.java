@@ -1,8 +1,8 @@
 package org.mataelang.kaspacore.providers;
 
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.mataelang.kaspacore.models.TestObject;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
 import java.util.HashMap;
@@ -13,7 +13,7 @@ public class Producer {
     protected String topic;
     protected Map<String, Object> config;
 
-    protected KafkaProducer<String, TestObject> producer;
+    protected KafkaProducer<String, JsonSchema> producer;
     public Producer() {
         config = new HashMap<>();
         setConfig("bootstrap.servers", "outputBootstrapServers");
@@ -36,10 +36,10 @@ public class Producer {
         producer.close();
     }
 
-    public void send(TestObject message) {
+    public void send(JsonSchema message) {
         producer.send(new ProducerRecord<>(topic, message));
     }
-    public void sendThenClose(TestObject message) {
+    public void sendThenClose(JsonSchema message) {
         producer.send(new ProducerRecord<>(topic, message));
         producer.close();
     }

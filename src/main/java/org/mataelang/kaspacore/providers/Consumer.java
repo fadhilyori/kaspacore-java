@@ -1,12 +1,13 @@
 package org.mataelang.kaspacore.providers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.confluent.kafka.serializers.KafkaJsonDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
 import org.apache.spark.streaming.kafka010.LocationStrategies;
-import org.mataelang.kaspacore.models.TestObject;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
 import java.util.Collections;
@@ -14,10 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Consumer {
-    private static Consumer instance;
-    private static JavaInputDStream<ConsumerRecord<String, TestObject>> stream;
     protected static String topic;
     protected static Map<String, Object> config;
+    private static Consumer instance;
+    private static JavaInputDStream<ConsumerRecord<String, JsonNode>> stream;
+
     public Consumer() {
         config = new HashMap<>();
         setConfig("bootstrap.servers", "inputBootstrapServers");
@@ -26,7 +28,15 @@ public class Consumer {
         setConfig("key.deserializer", "inputKeyDeserializer");
         setConfig("value.deserializer", "inputValueDeserializer");
         setConfig("enable.auto.commit", "inputEnableAutoCommit", false);
+        config.put(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, "com.fasterxml.jackson.databind.JsonNode");
         topic = PropertyManager.getInstance().getProperty("inputTopic");
+    }
+
+    public static Consumer getInstance() {
+        if (instance == null) {
+            instance = new Consumer();
+        }
+        return instance;
     }
 
     private void setConfig(String key, String propertyName) {
@@ -46,7 +56,7 @@ public class Consumer {
         return config;
     }
 
-    public JavaInputDStream<ConsumerRecord<String, TestObject>> getStream(JavaStreamingContext javaStreamingContext) {
+    public JavaInputDStream<ConsumerRecord<String, JsonNode>> getStream(JavaStreamingContext javaStreamingContext) {
         if (stream == null) {
             stream = KafkaUtils
                     .createDirectStream(
@@ -57,12 +67,5 @@ public class Consumer {
         }
 
         return stream;
-    }
-
-    public static Consumer getInstance() {
-        if (instance == null) {
-            instance = new Consumer();
-        }
-        return instance;
     }
 }
