@@ -1,16 +1,17 @@
 applicationName=KaspaCore
-sparkMaster=local[2]
+sparkMaster=local[*]
 
 inputBootstrapServers=127.0.0.1:9092
 inputKeyDeserializer=org.apache.kafka.common.serialization.StringDeserializer
-inputValueDeserializer=org.apache.kafka.common.serialization.StringDeserializer
+inputValueDeserializer=io.confluent.kafka.serializers.KafkaJsonDeserializer
 groupID=me_kaspa_core
 autoOffsetReset=latest
 inputTopic=messages
+maxmindDatabaseFilePath=GeoLite2-City.mmdb
 
 outputBootstrapServers=127.0.0.1:9092
 outputTopic=results
 outputAcks=all
 outputRetries=0
 outputKeySerializer=org.apache.kafka.common.serialization.StringSerializer
-outputValueSerializer=org.apache.kafka.common.serialization.StringSerializer
+outputValueSerializer=io.confluent.kafka.serializers.KafkaJsonSerializer
