@@ -1,5 +1,8 @@
 package org.mataelang.kaspacore.utils;
 
+import org.mataelang.kaspacore.exceptions.PropertyRuntimeException;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -9,32 +12,27 @@ public class PropertyManager {
     private Properties props;
 
     public PropertyManager() {
-        loadProperties();
+        try {
+            loadProperties();
+        } catch (IOException e) {
+            throw new PropertyRuntimeException(e);
+        }
     }
 
-    private void loadProperties() {
+    private void loadProperties() throws IOException {
         this.props = new Properties();
         InputStream inputStream;
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        String PROPERTIES_FILENAME = "app.properties";
-        inputStream = classLoader.getResourceAsStream(PROPERTIES_FILENAME);
+        String propertiesFilename = "app.properties";
+        inputStream = classLoader.getResourceAsStream(propertiesFilename);
 
         if (inputStream == null) {
-            throw new RuntimeException("Unable to open properties file "+ "app.properties");
+            throw new FileNotFoundException("Unable to open properties file "+ "app.properties");
         }
 
-        try {
-            props.load(inputStream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        props.load(inputStream);
+        inputStream.close();
     }
 
     public static PropertyManager getInstance() {

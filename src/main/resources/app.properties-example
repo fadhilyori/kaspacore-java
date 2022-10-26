@@ -15,3 +15,5 @@ outputAcks=all
 outputRetries=0
 outputKeySerializer=org.apache.kafka.common.serialization.StringSerializer
 outputValueSerializer=io.confluent.kafka.serializers.KafkaJsonSerializer
+
+LOG_LEVEL=DEBUG

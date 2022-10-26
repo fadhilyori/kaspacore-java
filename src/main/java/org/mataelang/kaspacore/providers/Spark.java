@@ -9,6 +9,9 @@ public class Spark {
     private static SparkConf sparkConf;
     private static JavaStreamingContext streamingContext;
 
+    private Spark() {
+    }
+
     public static JavaStreamingContext getStreamingContext() {
         if (sparkConf == null) {
             sparkConf = new SparkConf();

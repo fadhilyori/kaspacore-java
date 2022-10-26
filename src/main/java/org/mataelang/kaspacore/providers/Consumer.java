@@ -15,13 +15,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Consumer {
-    protected static String topic;
-    protected static Map<String, Object> config;
     private static Consumer instance;
-    private static JavaInputDStream<ConsumerRecord<String, JsonNode>> stream;
+    protected String topic = PropertyManager.getInstance().getProperty("inputTopic");
+    protected Map<String, Object> config = new HashMap<>();
+    private JavaInputDStream<ConsumerRecord<String, JsonNode>> stream;
 
     public Consumer() {
-        config = new HashMap<>();
         setConfig("bootstrap.servers", "inputBootstrapServers");
         setConfig("group.id", "groupID");
         setConfig("auto.offset.reset", "autoOffsetReset");
@@ -29,7 +28,6 @@ public class Consumer {
         setConfig("value.deserializer", "inputValueDeserializer");
         setConfig("enable.auto.commit", "inputEnableAutoCommit", false);
         config.put(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, "com.fasterxml.jackson.databind.JsonNode");
-        topic = PropertyManager.getInstance().getProperty("inputTopic");
     }
 
     public static Consumer getInstance() {
@@ -52,17 +50,13 @@ public class Consumer {
         config.put(key, configValue);
     }
 
-    public Map<String, Object> getConfigs() {
-        return config;
-    }
-
     public JavaInputDStream<ConsumerRecord<String, JsonNode>> getStream(JavaStreamingContext javaStreamingContext) {
         if (stream == null) {
             stream = KafkaUtils
                     .createDirectStream(
                             javaStreamingContext,
                             LocationStrategies.PreferConsistent(),
-                            ConsumerStrategies.Subscribe(Collections.singleton(topic), getConfigs())
+                            ConsumerStrategies.Subscribe(Collections.singleton(topic), config)
                     );
         }
 

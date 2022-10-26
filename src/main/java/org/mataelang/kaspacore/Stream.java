@@ -11,7 +11,6 @@ import org.apache.spark.sql.types.StructType;
 import org.mataelang.kaspacore.utils.Functions;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

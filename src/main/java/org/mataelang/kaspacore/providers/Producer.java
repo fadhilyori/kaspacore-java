@@ -13,7 +13,7 @@ public class Producer {
     protected String topic;
     protected Map<String, Object> config;
 
-    protected KafkaProducer<String, JsonSchema> producer;
+    protected KafkaProducer<String, JsonSchema> kafkaProducer;
     public Producer() {
         config = new HashMap<>();
         setConfig("bootstrap.servers", "outputBootstrapServers");
@@ -29,19 +29,19 @@ public class Producer {
     }
 
     public void connect() {
-        producer = new KafkaProducer<>(config);
+        kafkaProducer = new KafkaProducer<>(config);
     }
 
     public void close() {
-        producer.close();
+        kafkaProducer.close();
     }
 
     public void send(JsonSchema message) {
-        producer.send(new ProducerRecord<>(topic, message));
+        kafkaProducer.send(new ProducerRecord<>(topic, message));
     }
     public void sendThenClose(JsonSchema message) {
-        producer.send(new ProducerRecord<>(topic, message));
-        producer.close();
+        kafkaProducer.send(new ProducerRecord<>(topic, message));
+        kafkaProducer.close();
     }
 
     public static Producer getInstance() {
