@@ -1,6 +1,7 @@
 package org.mataelang.kaspacore;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
@@ -33,18 +34,22 @@ public class DataStream {
                 // send to kafka
                 recordIterator.forEachRemaining(message -> {
                     // TODO: lookup ip addr with maxmind geoip
-                    String srcAddr = message.value().get("src_addr").textValue();
+                    JsonNode srcAddrNode = message.value().get("src_addr");
 
-                    CityResponse srcAddrGeoIPDetail = IPLookupTool.getInstance().get(srcAddr);
+                    if (srcAddrNode != null) {
+                        String srcAddr = srcAddrNode.textValue();
 
-                    if (srcAddrGeoIPDetail != null) {
-                        Country country = srcAddrGeoIPDetail.getCountry();
-                        City city = srcAddrGeoIPDetail.getCity();
-                        Logger.getLogger(DataStream.class).debug("IPAddress=" + srcAddr
-                                + " CountryISO=\"" + country.getIsoCode() + "\""
-                                + " CountryName=\"" + country.getName() + "\""
-                                + " City=\"" + city.getName() + "\""
-                        );
+                        CityResponse srcAddrGeoIPDetail = IPLookupTool.getInstance().get(srcAddr);
+
+                        if (srcAddrGeoIPDetail != null) {
+                            Country country = srcAddrGeoIPDetail.getCountry();
+                            City city = srcAddrGeoIPDetail.getCity();
+                            Logger.getLogger(DataStream.class).debug("IPAddress=" + srcAddr
+                                    + " CountryISO=\"" + country.getIsoCode() + "\""
+                                    + " CountryName=\"" + country.getName() + "\""
+                                    + " City=\"" + city.getName() + "\""
+                            );
+                        }
                     }
 
                     // TODO: add the value with src_country_code key into the record
