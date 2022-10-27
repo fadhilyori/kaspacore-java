@@ -4,32 +4,35 @@ import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.functions;
+import org.mataelang.kaspacore.models.AggregationModel;
 import scala.jdk.CollectionConverters;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Functions {
-    public static Dataset<Row> aggregate(Dataset<Row> rowDataset, List<String> fields, String delayThreshold,
-                                         String windowDuration) {
+    private Functions() {}
 
+    public static Dataset<Row> aggregate(Dataset<Row> rowDataset, AggregationModel className) {
+
+        String timeColumn = "seconds";
+        String windowStartColumnName = "seconds";
         Dataset<Row> windowedCount = rowDataset
-                .withWatermark("seconds", delayThreshold)
+                .withWatermark(timeColumn, className.getDelayThreshold())
                 .groupBy(
                         CollectionConverters.IteratorHasAsScala(
                                 addGetColumn(
-                                        fields,
-                                        functions.window(rowDataset.col("seconds"), windowDuration)
+                                        className.getFields(),
+                                        functions.window(rowDataset.col(timeColumn), className.getWindowDuration())
                                 ).iterator()
                         ).asScala().toSeq()
                 ).count();
 
         return windowedCount.select(
                 CollectionConverters.IteratorHasAsScala(addGetColumn(
-                        fields,
-                        Arrays.asList(functions.col("window.start").alias("seconds"),
+                        className.getFields(),
+                        Arrays.asList(functions.col("window.start").alias(windowStartColumnName),
                                 functions.col("count")
                         ))
                         .iterator()).asScala().toSeq()
@@ -46,7 +49,7 @@ public class Functions {
     private static List<Column> addGetColumn(List<String> fields, List<Column> newColumn) {
 
         List<Column> newFields = fields.stream().map(Column::new).collect(Collectors.toList());
-        newColumn.forEach(f -> newFields.add(f));
+        newFields.addAll(newColumn);
 
         return newFields;
     }
