@@ -18,6 +18,7 @@ public class Functions {
 
         String timeColumn = "seconds";
         String windowStartColumnName = "seconds";
+
         Dataset<Row> windowedCount = rowDataset
                 .withWatermark(timeColumn, className.getDelayThreshold())
                 .groupBy(

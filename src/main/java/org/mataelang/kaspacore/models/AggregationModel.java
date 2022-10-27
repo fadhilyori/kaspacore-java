@@ -10,7 +10,7 @@ public class AggregationModel {
     public AggregationModel() {
         fields = null;
         delayThreshold = "1 minute";
-        windowDuration = "30 seconds";
+        windowDuration = "60 seconds";
     }
 
     public List<String> getFields() {
