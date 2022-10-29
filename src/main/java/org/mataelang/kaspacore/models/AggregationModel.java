@@ -4,11 +4,14 @@ import java.util.List;
 
 public class AggregationModel {
     protected List<String> fields;
+    protected List<String> nullableFields;
     protected String delayThreshold;
     protected String windowDuration;
 
+
     public AggregationModel() {
         fields = null;
+        nullableFields = null;
         delayThreshold = "1 minute";
         windowDuration = "60 seconds";
     }

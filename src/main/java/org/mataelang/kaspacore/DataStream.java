@@ -2,14 +2,17 @@ package org.mataelang.kaspacore;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
+import com.maxmind.geoip2.record.Location;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.streaming.kafka010.HasOffsetRanges;
 import org.apache.spark.streaming.kafka010.OffsetRange;
 import org.mataelang.kaspacore.providers.Consumer;
+import org.mataelang.kaspacore.providers.Producer;
 import org.mataelang.kaspacore.providers.Spark;
 import org.mataelang.kaspacore.utils.IPLookupTool;
 import org.mataelang.kaspacore.utils.PropertyManager;
@@ -27,38 +30,61 @@ public class DataStream {
             OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
 
             rdd.foreachPartition(recordIterator -> {
-//                Producer.getInstance().connect();
+                Producer.getInstance().connect();
 
 //                OffsetRange o = offsetRanges[TaskContext.get().partitionId()];
 
                 // send to kafka
                 recordIterator.forEachRemaining(message -> {
+                    ObjectNode node = message.value().deepCopy();
                     // TODO: lookup ip addr with maxmind geoip
-                    JsonNode srcAddrNode = message.value().get("src_addr");
+                    JsonNode srcAddrNode = node.get("src_addr");
+                    JsonNode dstAddrNode = node.get("dst_addr");
 
                     if (srcAddrNode != null) {
                         String srcAddr = srcAddrNode.textValue();
-
                         CityResponse srcAddrGeoIPDetail = IPLookupTool.getInstance().get(srcAddr);
+//                        System.out.println("Ip Geo Detail : " + srcAddrGeoIPDetail);
 
                         if (srcAddrGeoIPDetail != null) {
                             Country country = srcAddrGeoIPDetail.getCountry();
                             City city = srcAddrGeoIPDetail.getCity();
-                            Logger.getLogger(DataStream.class).debug("IPAddress=" + srcAddr
-                                    + " CountryISO=\"" + country.getIsoCode() + "\""
-                                    + " CountryName=\"" + country.getName() + "\""
-                                    + " City=\"" + city.getName() + "\""
-                            );
+                            Location location = srcAddrGeoIPDetail.getLocation();
+                            node.put("src_country_code", country.getIsoCode());
+                            node.put("src_country_name", country.getName());
+                            if (city.getName() != null) {
+                                node.put("src_city_name", city.getName());
+                            }
+                            node.put("src_long", location.getLongitude());
+                            node.put("src_lat", location.getLatitude());
                         }
                     }
 
+                    if (dstAddrNode != null) {
+                        String dstAddr = dstAddrNode.textValue();
+                        CityResponse dstAddrGeoIPDetail = IPLookupTool.getInstance().get(dstAddr);
+
+                        if (dstAddrGeoIPDetail != null) {
+                            Country country = dstAddrGeoIPDetail.getCountry();
+                            City city = dstAddrGeoIPDetail.getCity();
+                            Location location = dstAddrGeoIPDetail.getLocation();
+                            node.put("dst_country_code", country.getIsoCode());
+                            node.put("dst_country_name", country.getName());
+                            if (city.getName() != null) {
+                                node.put("dst_city_name", city.getName());
+                            }
+                            node.put("dst_long", location.getLongitude());
+                            node.put("dst_lat", location.getLatitude());
+                        }
+                    }
+                    System.out.println("Node GeoIP : " + node);
                     // TODO: add the value with src_country_code key into the record
 
                     // send to kafka
-//                    Producer.getInstance().send(result);
+                    Producer.getInstance().send(node);
                 });
 
-//                Producer.getInstance().close();
+                Producer.getInstance().close();
             });
 
 //            ((CanCommitOffsets) Consumer.getInstance().getStream(Spark.getStreamingContext()).inputDStream()).commitAsync(offsetRanges);

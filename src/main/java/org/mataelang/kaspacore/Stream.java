@@ -4,7 +4,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
-import org.mataelang.kaspacore.models.AggrEvent;
+import org.mataelang.kaspacore.models.*;
 import org.mataelang.kaspacore.schemas.EventSchema;
 import org.mataelang.kaspacore.utils.Functions;
 import org.mataelang.kaspacore.utils.PropertyManager;
@@ -23,7 +23,7 @@ public class Stream {
                 .format("kafka")
                 .option("kafka.bootstrap.servers", PropertyManager.getInstance().getProperty("inputBootstrapServers"))
                 .option("startingOffsets", PropertyManager.getInstance().getProperty("autoOffsetReset"))
-                .option("subscribe", PropertyManager.getInstance().getProperty("inputTopic"))
+                .option("subscribe", PropertyManager.getInstance().getProperty("outputTopic"))
                 .load();
 
         Dataset<Row> valueDF =
@@ -34,31 +34,18 @@ public class Stream {
                 ).select(functions.col("parsed_value.*"), functions.col("timestamp"));
 
         // Event Example
-        Dataset<Row> aggrEvent = Functions.aggregate(valueDF, new AggrEvent());
-//
-//        Dataset<Row> aggrTopIPAddress = Functions.aggregate(valueDF, new AggrTopIPAddress());
-//
-//        Dataset<Row> aggrTopNetInfo = Functions.aggregate(valueDF, new AggrTopNetInfo());
-//
-        aggrEvent.writeStream()
+//        Dataset<Row> aggrEvent = Functions.aggregate(valueDF, new AggrEvent());
+
+        Dataset<Row> aggrSourceIP = Functions.aggregate(valueDF, new AggrSourceIP());
+//        Dataset<Row> aggrDestIP = Functions.aggregate(valueDF, new AggrDestIP());
+//        Dataset<Row> aggrAlertInfo = Functions.aggregate(valueDF, new AggrAlertInfo());
+
+        aggrSourceIP.writeStream()
                 .outputMode("complete")
                 .format("console")
                 .option("truncate", false)
                 .start()
                 .awaitTermination();
-//
-//        aggrTopIPAddress.writeStream()
-//                .outputMode("complete")
-//                .format("console")
-//                .option("truncate", false)
-//                .start()
-//                .awaitTermination();
-//
-//        aggrTopNetInfo.writeStream()
-//                .outputMode("complete")
-//                .format("console")
-//                .option("truncate", false)
-//                .start()
-//                .awaitTermination();
+
     }
 }
