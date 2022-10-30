@@ -1,7 +1,6 @@
 package org.mataelang.kaspacore.providers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.mataelang.kaspacore.utils.PropertyManager;
@@ -11,22 +10,20 @@ import java.util.Map;
 
 public class Producer {
     private static Producer instance;
-    protected String topic;
     protected Map<String, Object> config;
 
     protected KafkaProducer<String, JsonNode> kafkaProducer;
     public Producer() {
         config = new HashMap<>();
-        setConfig("bootstrap.servers", "outputBootstrapServers");
-        setConfig("acks", "outputAcks");
-        setConfig("retries", "outputRetries");
-        setConfig("key.serializer", "outputKeySerializer");
-        setConfig("value.serializer", "outputValueSerializer");
-        topic = PropertyManager.getInstance().getProperty("outputTopic");
+        setConfig("bootstrap.servers", "KAFKA_BOOTSTRAP_SERVERS");
+        setConfig("acks", "KAFKA_OUTPUT_ACKS");
+        setConfig("retries", "KAFKA_OUTPUT_RETRIES");
+        setConfig("key.serializer", "KAFKA_INPUT_KEY_SERIALIZER");
+        setConfig("value.serializer", "KAFKA_INPUT_VALUE_SERIALIZER");
     }
 
     private void setConfig(String key, String propertyName) {
-        config.put(key, PropertyManager.getInstance().getProperty(propertyName));
+        config.put(key, PropertyManager.getProperty(propertyName));
     }
 
     public void connect() {
@@ -37,12 +34,8 @@ public class Producer {
         kafkaProducer.close();
     }
 
-    public void send(JsonNode message) {
+    public void send(String topic, JsonNode message) {
         kafkaProducer.send(new ProducerRecord<>(topic, message));
-    }
-    public void sendThenClose(JsonNode message) {
-        kafkaProducer.send(new ProducerRecord<>(topic, message));
-        kafkaProducer.close();
     }
 
     public static Producer getInstance() {

@@ -16,16 +16,15 @@ import java.util.Map;
 
 public class Consumer {
     private static Consumer instance;
-    protected String topic = PropertyManager.getInstance().getProperty("inputTopic");
     protected Map<String, Object> config = new HashMap<>();
     private JavaInputDStream<ConsumerRecord<String, JsonNode>> stream;
 
     public Consumer() {
-        setConfig("bootstrap.servers", "inputBootstrapServers");
-        setConfig("group.id", "groupID");
-        setConfig("auto.offset.reset", "autoOffsetReset");
-        setConfig("key.deserializer", "inputKeyDeserializer");
-        setConfig("value.deserializer", "inputValueDeserializer");
+        setConfig("bootstrap.servers", "KAFKA_BOOTSTRAP_SERVERS");
+        setConfig("group.id", "KAFKA_GROUP_ID");
+        setConfig("auto.offset.reset", "KAFKA_INPUT_STARTING_OFFSETS");
+        setConfig("key.deserializer", "KAFKA_INPUT_KEY_DESERIALIZER");
+        setConfig("value.deserializer", "KAFKA_INPUT_VALUE_DESERIALIZER");
         setConfig("enable.auto.commit", "inputEnableAutoCommit", false);
         config.put(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, "com.fasterxml.jackson.databind.JsonNode");
     }
@@ -38,12 +37,12 @@ public class Consumer {
     }
 
     private void setConfig(String key, String propertyName) {
-        config.put(key, PropertyManager.getInstance().getProperty(propertyName));
+        config.put(key, PropertyManager.getProperty(propertyName));
     }
 
     @SuppressWarnings("SameParameterValue")
     private void setConfig(String key, String propertyName, Object defaultValue) {
-        Object configValue = PropertyManager.getInstance().getProperty(propertyName);
+        Object configValue = PropertyManager.getProperty(propertyName);
         if (configValue == null) {
             configValue = defaultValue;
         }
@@ -51,6 +50,8 @@ public class Consumer {
     }
 
     public JavaInputDStream<ConsumerRecord<String, JsonNode>> getStream(JavaStreamingContext javaStreamingContext) {
+        String topic = PropertyManager.getProperty("SENSOR_STREAM_INPUT_TOPIC");
+
         if (stream == null) {
             stream = KafkaUtils
                     .createDirectStream(

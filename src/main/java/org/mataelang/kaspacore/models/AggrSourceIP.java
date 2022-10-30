@@ -9,5 +9,6 @@ public class AggrSourceIP extends AggregationModel{
                 "src_country_name", "src_long", "src_lat");
         delayThreshold = "1 minute";
         windowDuration = "10 seconds";
+        topic = "source_ip_address_10s";
     }
 }

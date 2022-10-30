@@ -11,5 +11,6 @@ public class AggrEvent extends AggregationModel {
                 "tcp_win", "tos", "ttl", "vlan", "sensor_id");
         delayThreshold = "1 minute";
         windowDuration = "10 seconds";
+        topic = "event_" + windowDuration.replace(" ", "_");
     }
 }

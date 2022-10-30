@@ -4,7 +4,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.streaming.DataStreamWriter;
 
-public class ConsoleOutput implements StreamOutput {
+public class ConsoleOutput implements StreamOutputInterface {
 
     private final String format = "console";
     private final String outputMode;
@@ -26,7 +26,7 @@ public class ConsoleOutput implements StreamOutput {
     }
 
     @Override
-    public DataStreamWriter<Row> runStream(Dataset<Row> rowDataset) {
+    public DataStreamWriter<Row> runStream(Dataset<Row> rowDataset, String topic) {
         return rowDataset.writeStream()
                 .outputMode(this.outputMode)
                 .format(this.format)

@@ -6,7 +6,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.streaming.DataStreamWriter;
 import org.mataelang.kaspacore.models.AggregationModel;
-import org.mataelang.kaspacore.outputs.StreamOutput;
+import org.mataelang.kaspacore.outputs.StreamOutputInterface;
 import scala.jdk.CollectionConverters;
 
 import java.util.Arrays;
@@ -17,7 +17,7 @@ public class Functions {
     private Functions() {}
 
     public static DataStreamWriter<Row> aggregateStream(Dataset<Row> rowDataset, AggregationModel className,
-                                                        StreamOutput streamOutput) {
+                                                        StreamOutputInterface streamOutputInterface) {
 
         String timeColumn = "seconds";
         String windowStartColumnName = "seconds";
@@ -42,7 +42,9 @@ public class Functions {
                         .iterator()).asScala().toSeq()
         );
 
-        return streamOutput.runStream(selectedField);
+
+
+        return streamOutputInterface.runStream(selectedField, className.getTopic());
     }
 
     private static List<Column> addGetColumn(List<String> fields, Column newColumn) {

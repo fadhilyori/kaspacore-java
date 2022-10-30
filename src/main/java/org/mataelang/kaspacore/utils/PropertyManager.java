@@ -9,6 +9,7 @@ import java.util.Properties;
 
 public class PropertyManager {
     private static PropertyManager instance;
+
     private Properties props;
 
     public PropertyManager() {
@@ -35,6 +36,10 @@ public class PropertyManager {
         inputStream.close();
     }
 
+    public Properties getProps() {
+        return props;
+    }
+
     public static PropertyManager getInstance() {
         if (instance == null) {
             synchronized (PropertyManager.class) {
@@ -45,7 +50,11 @@ public class PropertyManager {
         return instance;
     }
 
-    public String getProperty(String key) {
-        return props.getProperty(key);
+    public static String getProperty(String key) {
+        return getInstance().getProps().getProperty(key);
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        return getInstance().getProps().getProperty(key, defaultValue);
     }
 }

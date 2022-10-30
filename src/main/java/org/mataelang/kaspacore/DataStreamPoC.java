@@ -19,7 +19,7 @@ import java.util.*;
 
 public class DataStreamPoC {
     /* Get actual class name to be printed on */
-    static Logger log = Logger.getLogger(DataStream.class.getName());
+    static Logger log = Logger.getLogger(DataStreamPoC.class);
     public static Properties loadConfig(String filename) throws IOException {
         try (InputStream inputStream = DataStream.class.getClassLoader().getResourceAsStream(filename)) {
             Properties properties = new Properties();
@@ -44,25 +44,25 @@ public class DataStreamPoC {
         }
 
         SparkConf sparkConf = new SparkConf();
-        sparkConf.setAppName(properties.getProperty("applicationName"));
-        sparkConf.setMaster(properties.getProperty("sparkMaster"));
+        sparkConf.setAppName(properties.getProperty("SPARK_APP_NAME"));
+        sparkConf.setMaster(properties.getProperty("SPARK_MASTER"));
 
         JavaStreamingContext streamingContext = new JavaStreamingContext(sparkConf, Durations.seconds(1));
 
         Map<String, Object> kafkaParams = new HashMap<>();
-        kafkaParams.put("bootstrap.servers", properties.getProperty("inputBootstrapServers"));
-        kafkaParams.put("key.deserializer", properties.getProperty("inputKeyDeserializer"));
-        kafkaParams.put("value.deserializer", properties.getProperty("inputValueDeserializer"));
-        kafkaParams.put("group.id", properties.getProperty("groupID"));
-        kafkaParams.put("auto.offset.reset", properties.getProperty("autoOffsetReset"));
+        kafkaParams.put("bootstrap.servers", properties.getProperty("KAFKA_BOOTSTRAP_SERVERS"));
+        kafkaParams.put("key.deserializer", properties.getProperty("KAFKA_INPUT_KEY_DESERIALIZER"));
+        kafkaParams.put("value.deserializer", properties.getProperty("KAFKA_INPUT_VALUE_DESERIALIZER"));
+        kafkaParams.put("group.id", properties.getProperty("KAFKA_GROUP_ID"));
+        kafkaParams.put("auto.offset.reset", properties.getProperty("KAFKA_INPUT_STARTING_OFFSETS"));
         kafkaParams.put("enable.auto.commit", false);
 
         Map<String, Object> kafkaProducerParams = new HashMap<>();
-        kafkaProducerParams.put("bootstrap.servers", properties.getProperty("outputBootstrapServers"));
-        kafkaProducerParams.put("acks", properties.getProperty("outputAcks"));
-        kafkaProducerParams.put("retries", Integer.valueOf(properties.getProperty("outputRetries")));
-        kafkaProducerParams.put("key.serializer", properties.getProperty("outputKeySerializer"));
-        kafkaProducerParams.put("value.serializer", properties.getProperty("outputValueSerializer"));
+        kafkaProducerParams.put("bootstrap.servers", properties.getProperty("KAFKA_BOOTSTRAP_SERVERS"));
+        kafkaProducerParams.put("acks", properties.getProperty("KAFKA_OUTPUT_ACKS"));
+        kafkaProducerParams.put("retries", Integer.valueOf(properties.getProperty("KAFKA_OUTPUT_RETRIES")));
+        kafkaProducerParams.put("key.serializer", properties.getProperty("KAFKA_INPUT_KEY_SERIALIZER"));
+        kafkaProducerParams.put("value.serializer", properties.getProperty("KAFKA_INPUT_VALUE_SERIALIZER"));
 
         Collection<String> topics = List.of(properties.getProperty("kafkaTopics"));
 
@@ -82,7 +82,7 @@ public class DataStreamPoC {
                 KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(kafkaProducerParams);
                 OffsetRange o = offsetRanges[TaskContext.get().partitionId()];
                 log.debug(o.topic() + " " + o.partition() + " " + o.fromOffset() + " " + o.untilOffset());
-                recordIterator.forEachRemaining(stringStringConsumerRecord -> kafkaProducer.send(new ProducerRecord<>(properties.getProperty("outputTopic"), stringStringConsumerRecord.value())));
+                recordIterator.forEachRemaining(stringStringConsumerRecord -> kafkaProducer.send(new ProducerRecord<>(properties.getProperty("SENSOR_STREAM_OUTPUT_TOPIC"), stringStringConsumerRecord.value())));
                 kafkaProducer.close();
             });
 

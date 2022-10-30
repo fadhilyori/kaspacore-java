@@ -11,22 +11,24 @@ import org.mataelang.kaspacore.schemas.EventSchema;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
 public class Spark {
-    private static SparkConf sparkConf;
     private static JavaStreamingContext streamingContext;
 
     private Spark() {
     }
 
-    public static JavaStreamingContext getStreamingContext() {
-        if (sparkConf == null) {
-            sparkConf = new SparkConf();
-            sparkConf.setAppName(PropertyManager.getInstance().getProperty("applicationName"));
-            sparkConf.setMaster(PropertyManager.getInstance().getProperty("sparkMaster"));
-            sparkConf.validateSettings();
-        }
+    private static SparkConf getSparkConf() {
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.setAppName(PropertyManager.getProperty("SPARK_APP_NAME"));
+        sparkConf.setMaster(PropertyManager.getProperty("SPARK_MASTER"));
+        sparkConf.set("spark.sql.session.timeZone", PropertyManager.getProperty("SPARK_MASTER", "Asia/Jakarta"));
+        sparkConf.validateSettings();
 
+        return sparkConf;
+    }
+
+    public static JavaStreamingContext getStreamingContext() {
         if (streamingContext == null) {
-            streamingContext = new JavaStreamingContext(sparkConf, Durations.seconds(1));
+            streamingContext = new JavaStreamingContext(getSparkConf(), Durations.seconds(1));
         }
 
         return streamingContext;
@@ -35,9 +37,7 @@ public class Spark {
     public static SparkSession getSparkSession() {
         return SparkSession
                 .builder()
-                .appName(PropertyManager.getInstance().getProperty("applicationName"))
-                .master(PropertyManager.getInstance().getProperty("sparkMaster"))
-                .config("spark.sql.session.timeZone", "Asia/Jakarta")
+                .config(getSparkConf())
                 .getOrCreate();
     }
 
@@ -48,9 +48,9 @@ public class Spark {
     public static Dataset<Row> getSparkKafkaStream(SparkSession sparkSession) {
         return sparkSession.readStream()
                 .format("kafka")
-                .option("kafka.bootstrap.servers", PropertyManager.getInstance().getProperty("inputBootstrapServers"))
-                .option("startingOffsets", PropertyManager.getInstance().getProperty("autoOffsetReset"))
-                .option("subscribe", PropertyManager.getInstance().getProperty("outputTopic"))
+                .option("kafka.bootstrap.servers", PropertyManager.getProperty("KAFKA_BOOTSTRAP_SERVERS"))
+                .option("startingOffsets", PropertyManager.getProperty("KAFKA_INPUT_STARTING_OFFSETS", "latest"))
+                .option("subscribe", PropertyManager.getProperty("SENSOR_STREAM_OUTPUT_TOPIC"))
                 .load();
     }
 

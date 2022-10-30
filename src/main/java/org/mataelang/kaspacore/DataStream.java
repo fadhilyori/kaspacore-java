@@ -9,6 +9,7 @@ import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.spark.streaming.kafka010.CanCommitOffsets;
 import org.apache.spark.streaming.kafka010.HasOffsetRanges;
 import org.apache.spark.streaming.kafka010.OffsetRange;
 import org.mataelang.kaspacore.providers.Consumer;
@@ -21,7 +22,7 @@ public class DataStream {
     public static void main(String[] args) throws InterruptedException {
         Logger.getLogger(DataStream.class).setLevel(
                 Level.toLevel(
-                        PropertyManager.getInstance().getProperty("LOG_LEVEL"),
+                        PropertyManager.getProperty("LOG_LEVEL"),
                         Level.DEBUG
                 )
         );
@@ -37,14 +38,12 @@ public class DataStream {
                 // send to kafka
                 recordIterator.forEachRemaining(message -> {
                     ObjectNode node = message.value().deepCopy();
-                    // TODO: lookup ip addr with maxmind geoip
                     JsonNode srcAddrNode = node.get("src_addr");
                     JsonNode dstAddrNode = node.get("dst_addr");
 
                     if (srcAddrNode != null) {
                         String srcAddr = srcAddrNode.textValue();
                         CityResponse srcAddrGeoIPDetail = IPLookupTool.getInstance().get(srcAddr);
-//                        System.out.println("Ip Geo Detail : " + srcAddrGeoIPDetail);
 
                         if (srcAddrGeoIPDetail != null) {
                             Country country = srcAddrGeoIPDetail.getCountry();
@@ -77,17 +76,15 @@ public class DataStream {
                             node.put("dst_lat", location.getLatitude());
                         }
                     }
-                    System.out.println("Node GeoIP : " + node);
-                    // TODO: add the value with src_country_code key into the record
 
                     // send to kafka
-                    Producer.getInstance().send(node);
+                    Producer.getInstance().send(PropertyManager.getProperty("SENSOR_STREAM_OUTPUT_TOPIC"), node);
                 });
 
                 Producer.getInstance().close();
             });
 
-//            ((CanCommitOffsets) Consumer.getInstance().getStream(Spark.getStreamingContext()).inputDStream()).commitAsync(offsetRanges);
+            ((CanCommitOffsets) Consumer.getInstance().getStream(Spark.getStreamingContext()).inputDStream()).commitAsync(offsetRanges);
         });
 
         Spark.getStreamingContext().start();
