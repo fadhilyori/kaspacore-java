@@ -76,7 +76,7 @@ public class DataStream {
                             node.put("dst_lat", location.getLatitude());
                         }
                     }
-
+//                    System.out.println(node);
                     // send to kafka
                     Producer.getInstance().send(PropertyManager.getProperty("SENSOR_STREAM_OUTPUT_TOPIC"), node);
                 });

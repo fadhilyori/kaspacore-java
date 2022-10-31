@@ -1,9 +1,14 @@
 package org.mataelang.kaspacore.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
+import com.maxmind.geoip2.record.Country;
+import com.maxmind.geoip2.record.Location;
 import org.apache.log4j.Logger;
 import org.mataelang.kaspacore.DataStream;
 
@@ -42,6 +47,27 @@ public class IPLookupTool {
         }
 
         return new File(maxmindDBFileUri);
+    }
+
+    public static ObjectNode IpEnrichmentFunc(ObjectNode messageNode, JsonNode addrNode, String prefix) {
+        if (addrNode != null) {
+            String addr = addrNode.textValue();
+            CityResponse addrGeoIPDetail = getInstance().get(addr);
+
+            if (addrGeoIPDetail != null) {
+                Country country = addrGeoIPDetail.getCountry();
+                City city = addrGeoIPDetail.getCity();
+                Location location = addrGeoIPDetail.getLocation();
+                messageNode.put(prefix + "_country_code", country.getIsoCode());
+                messageNode.put(prefix + "_country_name", country.getName());
+                if(city.getName() != null) {
+                    messageNode.put(prefix + "_city_name", city.getName());
+                }
+                messageNode.put(prefix + "_long", location.getLongitude());
+                messageNode.put(prefix + "_lat", location.getLatitude());
+            }
+        }
+        return messageNode;
     }
 
     private static DatabaseReader build(File maxmindDBFile) throws IOException {

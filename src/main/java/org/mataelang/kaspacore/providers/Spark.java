@@ -20,7 +20,7 @@ public class Spark {
         SparkConf sparkConf = new SparkConf();
         sparkConf.setAppName(PropertyManager.getProperty("SPARK_APP_NAME"));
         sparkConf.setMaster(PropertyManager.getProperty("SPARK_MASTER"));
-        sparkConf.set("spark.sql.session.timeZone", PropertyManager.getProperty("SPARK_MASTER", "Asia/Jakarta"));
+        sparkConf.set("spark.sql.session.timeZone", PropertyManager.getProperty("TIMEZONE", "Asia/Jakarta"));
         sparkConf.validateSettings();
 
         return sparkConf;
