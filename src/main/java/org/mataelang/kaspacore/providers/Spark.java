@@ -7,7 +7,7 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.mataelang.kaspacore.schemas.EventSchema;
+import org.mataelang.kaspacore.utils.Functions;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
 public class Spark {
@@ -58,7 +58,7 @@ public class Spark {
         return Spark.getSparkKafkaStream().select(
                 functions.from_json(
                         functions.col("value").cast("string"),
-                        EventSchema.getSchema()
+                        Functions.getSchemaFromFile()
                 ).alias("parsed_value"),
                 functions.col("timestamp")
         ).select(

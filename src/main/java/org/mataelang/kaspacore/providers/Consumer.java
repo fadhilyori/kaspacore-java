@@ -11,22 +11,19 @@ import org.apache.spark.streaming.kafka010.LocationStrategies;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
-public class Consumer {
+public class Consumer extends KafkaProvider {
     private static Consumer instance;
-    protected Map<String, Object> config = new HashMap<>();
     private JavaInputDStream<ConsumerRecord<String, JsonNode>> stream;
 
     public Consumer() {
         setConfig("bootstrap.servers", "KAFKA_BOOTSTRAP_SERVERS");
         setConfig("group.id", "KAFKA_GROUP_ID");
         setConfig("auto.offset.reset", "KAFKA_INPUT_STARTING_OFFSETS");
-        setConfig("key.deserializer", "KAFKA_INPUT_KEY_DESERIALIZER");
-        setConfig("value.deserializer", "KAFKA_INPUT_VALUE_DESERIALIZER");
-        setConfig("enable.auto.commit", "inputEnableAutoCommit", false);
-        config.put(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, "com.fasterxml.jackson.databind.JsonNode");
+        setConfig("key.deserializer", "KAFKA_INPUT_KEY_DESERIALIZER", "org.apache.kafka.common.serialization.StringDeserializer");
+        setConfig("value.deserializer", "KAFKA_INPUT_VALUE_DESERIALIZER", "io.confluent.kafka.serializers.KafkaJsonDeserializer");
+        setConfig("enable.auto.commit", "inputEnableAutoCommit", "false");
+        setConfigValue(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, "com.fasterxml.jackson.databind.JsonNode");
     }
 
     public static Consumer getInstance() {
@@ -34,19 +31,6 @@ public class Consumer {
             instance = new Consumer();
         }
         return instance;
-    }
-
-    private void setConfig(String key, String propertyName) {
-        config.put(key, PropertyManager.getProperty(propertyName));
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private void setConfig(String key, String propertyName, Object defaultValue) {
-        Object configValue = PropertyManager.getProperty(propertyName);
-        if (configValue == null) {
-            configValue = defaultValue;
-        }
-        config.put(key, configValue);
     }
 
     public JavaInputDStream<ConsumerRecord<String, JsonNode>> getStream(JavaStreamingContext javaStreamingContext) {
@@ -57,7 +41,7 @@ public class Consumer {
                     .createDirectStream(
                             javaStreamingContext,
                             LocationStrategies.PreferConsistent(),
-                            ConsumerStrategies.Subscribe(Collections.singleton(topic), config)
+                            ConsumerStrategies.Subscribe(Collections.singleton(topic), getConfig())
                     );
         }
 

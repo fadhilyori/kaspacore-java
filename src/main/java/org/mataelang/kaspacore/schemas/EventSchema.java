@@ -1,9 +1,19 @@
 package org.mataelang.kaspacore.schemas;
 
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.apache.spark.sql.types.*;
+import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
+import org.mataelang.kaspacore.providers.Spark;
+import scala.io.Source;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class EventSchema {
     private static final StructType schema = new StructType(new StructField[]{

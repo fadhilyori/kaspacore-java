@@ -11,6 +11,7 @@ import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
 import org.apache.log4j.Logger;
 import org.mataelang.kaspacore.DataStream;
+import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class IPLookupTool {
         try {
             this.reader = buildWithCache(maxmindDBFile);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new KaspaCoreRuntimeException(e);
         }
     }
 
@@ -43,13 +44,13 @@ public class IPLookupTool {
                             .getResource(filename))
                     .toURI();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new KaspaCoreRuntimeException(e);
         }
 
         return new File(maxmindDBFileUri);
     }
 
-    public static ObjectNode IpEnrichmentFunc(ObjectNode messageNode, JsonNode addrNode, String prefix) {
+    public static ObjectNode ipEnrichmentFunc(ObjectNode messageNode, JsonNode addrNode, String prefix) {
         if (addrNode != null) {
             String addr = addrNode.textValue();
             CityResponse addrGeoIPDetail = getInstance().get(addr);
@@ -60,7 +61,7 @@ public class IPLookupTool {
                 Location location = addrGeoIPDetail.getLocation();
                 messageNode.put(prefix + "_country_code", country.getIsoCode());
                 messageNode.put(prefix + "_country_name", country.getName());
-                if(city.getName() != null) {
+                if (city.getName() != null) {
                     messageNode.put(prefix + "_city_name", city.getName());
                 }
                 messageNode.put(prefix + "_long", location.getLongitude());
@@ -68,10 +69,6 @@ public class IPLookupTool {
             }
         }
         return messageNode;
-    }
-
-    private static DatabaseReader build(File maxmindDBFile) throws IOException {
-        return new DatabaseReader.Builder(maxmindDBFile).build();
     }
 
     private static DatabaseReader buildWithCache(File maxmindDBFile) throws IOException {
@@ -98,7 +95,7 @@ public class IPLookupTool {
         try {
             cityResponse = IPLookupTool.getInstance().getReader().city(srcAddress);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new KaspaCoreRuntimeException(e);
         } catch (GeoIp2Exception e) {
             Logger.getLogger(DataStream.class).debug(e);
             return null;
