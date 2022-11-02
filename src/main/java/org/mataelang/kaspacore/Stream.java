@@ -2,6 +2,9 @@ package org.mataelang.kaspacore;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.mataelang.kaspacore.models.AggrAlertInfo;
+import org.mataelang.kaspacore.models.AggrDestIP;
+import org.mataelang.kaspacore.models.AggrEvent;
 import org.mataelang.kaspacore.models.AggrSourceIP;
 import org.mataelang.kaspacore.providers.Spark;
 import static org.mataelang.kaspacore.utils.Functions.aggregateStream;
@@ -11,7 +14,16 @@ public class Stream {
         Dataset<Row> rowDataset = Spark.getSparkKafkaStreamParsed();
 
         // List of jobs
+        aggregateStream(rowDataset, new AggrAlertInfo())
+                .start().awaitTermination();
+
         aggregateStream(rowDataset, new AggrSourceIP())
+                .start().awaitTermination();
+
+        aggregateStream(rowDataset, new AggrDestIP())
+                .start().awaitTermination();
+
+        aggregateStream(rowDataset, new AggrEvent())
                 .start().awaitTermination();
 
     }
