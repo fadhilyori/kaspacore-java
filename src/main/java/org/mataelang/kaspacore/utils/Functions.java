@@ -1,7 +1,6 @@
 package org.mataelang.kaspacore.utils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -13,7 +12,6 @@ import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
 import org.mataelang.kaspacore.models.AggregationModel;
 import org.mataelang.kaspacore.outputs.KafkaOutput;
 import org.mataelang.kaspacore.outputs.StreamOutputInterface;
-import org.mataelang.kaspacore.schemas.EventSchema;
 import scala.jdk.CollectionConverters;
 
 import java.io.File;
@@ -23,6 +21,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Functions {
@@ -34,6 +33,12 @@ public class Functions {
         String timeColumn = "seconds";
         String windowStartColumnName = "seconds";
         StreamOutputInterface streamOutputInterface = new KafkaOutput(className.getTopic());
+
+        if (className.getPrimaryKey() != null) {
+            rowDataset = rowDataset.na().drop(
+                    CollectionConverters.IteratorHasAsScala(className.getFields().iterator()).asScala().toSeq()
+            );
+        }
 
         Dataset<Row> windowedCount = rowDataset
                 .withWatermark(timeColumn, className.getDelayThreshold())
@@ -78,13 +83,12 @@ public class Functions {
         String content;
 
         try {
-            uri = ClassLoader.getSystemClassLoader().getResource("event_schema.json").toURI();
+            uri = Objects.requireNonNull(ClassLoader.getSystemClassLoader().getResource("event_schema.json")).toURI();
             content = FileUtils.readFileToString(new File(uri), StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
             throw new KaspaCoreRuntimeException(e);
         }
 
-        Logger.getLogger(EventSchema.class).error(content);
         return (StructType) DataType.fromJson(content);
     }
 }

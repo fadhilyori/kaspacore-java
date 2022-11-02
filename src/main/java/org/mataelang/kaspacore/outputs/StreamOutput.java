@@ -10,9 +10,19 @@ import java.util.Map;
 public class StreamOutput implements StreamOutputInterface {
     private final Map<String, String> options;
     private String format;
+    private String outputMode;
 
     public StreamOutput() {
         options = new HashMap<>();
+        outputMode = "complete";
+    }
+
+    public String getOutputMode() {
+        return outputMode;
+    }
+
+    public void setOutputMode(String outputMode) {
+        this.outputMode = outputMode;
     }
 
     public String getFormat() {
@@ -33,6 +43,7 @@ public class StreamOutput implements StreamOutputInterface {
 
     public DataStreamWriter<Row> runStream(Dataset<Row> rowDataset) {
         return rowDataset.writeStream()
+                .outputMode(getOutputMode())
                 .format(getFormat())
                 .options(getOptions());
     }

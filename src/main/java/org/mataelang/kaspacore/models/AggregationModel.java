@@ -20,11 +20,15 @@ public class AggregationModel {
     public List<String> getFields() {
         return fields;
     }
-    public List<String> getNullableFields() {
-        return nullableFields;
+
+    public String getDelayThreshold() {
+        return delayThreshold;
     }
-    public String getDelayThreshold() { return delayThreshold; }
-    public String getWindowDuration() { return windowDuration; }
+
+    public String getWindowDuration() {
+        return windowDuration;
+    }
+
     public String getTopic() {
         return topic;
     }
