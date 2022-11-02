@@ -51,6 +51,6 @@ public class AggrEvent extends AggregationModel {
         );
         delayThreshold = "1 minute";
         windowDuration = "10 seconds";
-        topic = "event_" + windowDuration.replace(" ", "_");
+        topic = "event_all_10s";
     }
 }
