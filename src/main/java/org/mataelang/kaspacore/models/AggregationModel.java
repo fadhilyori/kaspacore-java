@@ -8,6 +8,7 @@ public class AggregationModel {
     protected String delayThreshold;
     protected String windowDuration;
     protected String topic;
+    protected Boolean dropRowIfNull;
 
     public AggregationModel() {
         fields = null;
@@ -15,6 +16,15 @@ public class AggregationModel {
         delayThreshold = "1 minute";
         windowDuration = "60 seconds";
         topic = null;
+        dropRowIfNull = true;
+    }
+
+    public Boolean getDropRowIfNull() {
+        return dropRowIfNull;
+    }
+
+    public void setDropRowIfNull(Boolean dropRowIfNull) {
+        this.dropRowIfNull = dropRowIfNull;
     }
 
     public List<String> getFields() {

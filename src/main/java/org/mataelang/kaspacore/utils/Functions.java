@@ -34,7 +34,7 @@ public class Functions {
         String windowStartColumnName = "seconds";
         StreamOutputInterface streamOutputInterface = new KafkaOutput(className.getTopic());
 
-        if (className.getPrimaryKey() != null) {
+        if (className.getDropRowIfNull()) {
             rowDataset = rowDataset.na().drop(
                     CollectionConverters.IteratorHasAsScala(className.getFields().iterator()).asScala().toSeq()
             );
