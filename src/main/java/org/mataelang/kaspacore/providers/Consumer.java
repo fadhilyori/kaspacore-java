@@ -3,6 +3,7 @@ package org.mataelang.kaspacore.providers;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.confluent.kafka.serializers.KafkaJsonDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.log4j.Logger;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka010.ConsumerStrategies;
@@ -37,12 +38,14 @@ public class Consumer extends KafkaProvider {
         String topic = PropertyManager.getProperty("SENSOR_STREAM_INPUT_TOPIC");
 
         if (stream == null) {
+            Logger.getLogger(PropertyManager.class).debug("Creating stream class..");
             stream = KafkaUtils
                     .createDirectStream(
                             javaStreamingContext,
                             LocationStrategies.PreferConsistent(),
                             ConsumerStrategies.Subscribe(Collections.singleton(topic), getConfig())
                     );
+            Logger.getLogger(PropertyManager.class).debug("Class stream created.");
         }
 
         return stream;

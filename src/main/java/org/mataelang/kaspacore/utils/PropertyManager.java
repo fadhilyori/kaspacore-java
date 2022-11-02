@@ -1,5 +1,6 @@
 package org.mataelang.kaspacore.utils;
 
+import org.apache.log4j.Logger;
 import org.mataelang.kaspacore.exceptions.PropertyRuntimeException;
 
 import java.io.FileNotFoundException;
@@ -21,6 +22,7 @@ public class PropertyManager {
     }
 
     private void loadProperties() throws IOException {
+        Logger.getLogger(PropertyManager.class).debug("Loading properties file...");
         this.props = new Properties();
         InputStream inputStream;
         ClassLoader classLoader = this.getClass().getClassLoader();
@@ -33,6 +35,7 @@ public class PropertyManager {
         }
 
         props.load(inputStream);
+        Logger.getLogger(PropertyManager.class).info("Configuration loaded.");
         inputStream.close();
     }
 

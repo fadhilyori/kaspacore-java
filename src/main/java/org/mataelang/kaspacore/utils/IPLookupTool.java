@@ -6,9 +6,8 @@ import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.record.City;
-import com.maxmind.geoip2.record.Country;
-import com.maxmind.geoip2.record.Location;
+import com.maxmind.geoip2.model.CountryResponse;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
 import org.mataelang.kaspacore.DataStream;
 import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
@@ -50,25 +49,31 @@ public class IPLookupTool {
         return new File(maxmindDBFileUri);
     }
 
-    public static ObjectNode ipEnrichmentFunc(ObjectNode messageNode, JsonNode addrNode, String prefix) {
-        if (addrNode != null) {
-            String addr = addrNode.textValue();
-            CityResponse addrGeoIPDetail = getInstance().get(addr);
+    public static ObjectNode ipEnrichmentFunc(ConsumerRecord<String, JsonNode> messageNode) {
+        ObjectNode objectNode = messageNode.value().deepCopy();
 
-            if (addrGeoIPDetail != null) {
-                Country country = addrGeoIPDetail.getCountry();
-                City city = addrGeoIPDetail.getCity();
-                Location location = addrGeoIPDetail.getLocation();
-                messageNode.put(prefix + "_country_code", country.getIsoCode());
-                messageNode.put(prefix + "_country_name", country.getName());
-                if (city.getName() != null) {
-                    messageNode.put(prefix + "_city_name", city.getName());
-                }
-                messageNode.put(prefix + "_long", location.getLongitude());
-                messageNode.put(prefix + "_lat", location.getLatitude());
-            }
+        if (objectNode.get("src_addr").isNull()) {
+            return objectNode;
         }
-        return messageNode;
+
+        if (objectNode.get("dst_addr").isNull()) {
+            return objectNode;
+        }
+
+        CountryResponse srcAddrCountry = getInstance().getCountry(objectNode.get("src_addr").textValue());
+        CountryResponse dstAddrCountry = getInstance().getCountry(objectNode.get("dst_addr").textValue());
+
+        if (srcAddrCountry != null) {
+            objectNode.put("src_country_code", srcAddrCountry.getCountry().getIsoCode());
+            objectNode.put("src_country_name", srcAddrCountry.getCountry().getName());
+        }
+
+        if (dstAddrCountry != null) {
+            objectNode.put("dst_country_code", dstAddrCountry.getCountry().getIsoCode());
+            objectNode.put("dst_country_name", dstAddrCountry.getCountry().getName());
+        }
+
+        return objectNode;
     }
 
     private static DatabaseReader buildWithCache(File maxmindDBFile) throws IOException {
@@ -82,7 +87,7 @@ public class IPLookupTool {
         return instance;
     }
 
-    public CityResponse get(String ipAddress) {
+    public CityResponse getCity(String ipAddress) {
         InetAddress srcAddress;
         try {
             srcAddress = InetAddress.getByName(ipAddress);
@@ -102,6 +107,28 @@ public class IPLookupTool {
         }
 
         return cityResponse;
+    }
+
+    public CountryResponse getCountry(String ipAddress) {
+        InetAddress srcAddress;
+        try {
+            srcAddress = InetAddress.getByName(ipAddress);
+        } catch (UnknownHostException e) {
+            Logger.getLogger(this.getClass()).debug(e);
+            return null;
+        }
+
+        CountryResponse countryResponse;
+        try {
+            countryResponse = IPLookupTool.getInstance().getReader().country(srcAddress);
+        } catch (IOException e) {
+            throw new KaspaCoreRuntimeException(e);
+        } catch (GeoIp2Exception e) {
+            Logger.getLogger(DataStream.class).debug(e);
+            return null;
+        }
+
+        return countryResponse;
     }
 
     public DatabaseReader getReader() {

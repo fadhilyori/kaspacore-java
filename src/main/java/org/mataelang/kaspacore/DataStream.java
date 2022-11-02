@@ -1,7 +1,6 @@
 package org.mataelang.kaspacore;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -33,15 +32,10 @@ public class DataStream {
 
                 // send to kafka
                 recordIterator.forEachRemaining(message -> {
-                    ObjectNode node = message.value().deepCopy();
-                    JsonNode srcAddrNode = node.get("src_addr");
-                    JsonNode dstAddrNode = node.get("dst_addr");
-
-                    IPLookupTool.ipEnrichmentFunc(node, srcAddrNode, "src");
-                    IPLookupTool.ipEnrichmentFunc(node, dstAddrNode, "dst");
+                    ObjectNode objectNode = IPLookupTool.ipEnrichmentFunc(message);
 
                     // send to kafka
-                    Producer.getInstance().send(PropertyManager.getProperty("SENSOR_STREAM_OUTPUT_TOPIC"), node);
+                    Producer.getInstance().send(PropertyManager.getProperty("SENSOR_STREAM_OUTPUT_TOPIC"), objectNode);
                 });
 
                 Producer.getInstance().close();
