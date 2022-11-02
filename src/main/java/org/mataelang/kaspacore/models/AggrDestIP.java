@@ -7,7 +7,6 @@ public class AggrDestIP extends AggregationModel{
         fields = Arrays.asList(
                 "action",
                 "dst_addr",
-                "dst_city_name",
                 "dst_country_code",
                 "dst_country_name",
                 "dst_lat",

@@ -7,6 +7,7 @@ import org.mataelang.kaspacore.models.AggrDestIP;
 import org.mataelang.kaspacore.models.AggrEvent;
 import org.mataelang.kaspacore.models.AggrSourceIP;
 import org.mataelang.kaspacore.providers.Spark;
+
 import static org.mataelang.kaspacore.utils.Functions.aggregateStream;
 
 public class Stream {
@@ -15,16 +16,17 @@ public class Stream {
 
         // List of jobs
         aggregateStream(rowDataset, new AggrAlertInfo())
-                .start().awaitTermination();
+                .start();
 
         aggregateStream(rowDataset, new AggrSourceIP())
-                .start().awaitTermination();
+                .start();
 
         aggregateStream(rowDataset, new AggrDestIP())
-                .start().awaitTermination();
+                .start();
 
         aggregateStream(rowDataset, new AggrEvent())
-                .start().awaitTermination();
+                .start();
 
+        Spark.getSparkSession().streams().awaitAnyTermination();
     }
 }

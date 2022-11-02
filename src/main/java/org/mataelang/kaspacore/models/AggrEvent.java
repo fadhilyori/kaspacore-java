@@ -52,5 +52,6 @@ public class AggrEvent extends AggregationModel {
         delayThreshold = "1 minute";
         windowDuration = "10 seconds";
         topic = "event_all_10s";
+        dropRowIfNull = false;
     }
 }

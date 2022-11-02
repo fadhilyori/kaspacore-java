@@ -34,9 +34,11 @@ public class Functions {
         String windowStartColumnName = "seconds";
         StreamOutputInterface streamOutputInterface = new KafkaOutput(className.getTopic());
 
-        if (className.getDropRowIfNull()) {
+        if (Boolean.TRUE.equals(className.getDropRowIfNull())) {
             rowDataset = rowDataset.na().drop(
-                    CollectionConverters.IteratorHasAsScala(className.getFields().iterator()).asScala().toSeq()
+                    CollectionConverters.IteratorHasAsScala(
+                            className.getFields().iterator()
+                    ).asScala().toSeq()
             );
         }
 
@@ -46,7 +48,10 @@ public class Functions {
                         CollectionConverters.IteratorHasAsScala(
                                 addGetColumn(
                                         className.getFields(),
-                                        functions.window(rowDataset.col(timeColumn), className.getWindowDuration())
+                                        functions.window(
+                                                rowDataset.col(timeColumn),
+                                                className.getWindowDuration()
+                                        )
                                 ).iterator()
                         ).asScala().toSeq()
                 ).count();
@@ -71,7 +76,6 @@ public class Functions {
     }
 
     private static List<Column> addGetColumn(List<String> fields, List<Column> newColumn) {
-
         List<Column> newFields = fields.stream().map(Column::new).collect(Collectors.toList());
         newFields.addAll(newColumn);
 
@@ -83,7 +87,9 @@ public class Functions {
         String content;
 
         try {
-            uri = Objects.requireNonNull(ClassLoader.getSystemClassLoader().getResource("event_schema.json")).toURI();
+            uri = Objects.requireNonNull(
+                    ClassLoader.getSystemClassLoader().getResource("event_schema.json")
+            ).toURI();
             content = FileUtils.readFileToString(new File(uri), StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
             throw new KaspaCoreRuntimeException(e);
