@@ -52,11 +52,11 @@ public class IPLookupTool {
     public static ObjectNode ipEnrichmentFunc(ConsumerRecord<String, JsonNode> messageNode) {
         ObjectNode objectNode = messageNode.value().deepCopy();
 
-        if (objectNode.get("src_addr").isNull()) {
+        if (!objectNode.has("src_addr")) {
             return objectNode;
         }
 
-        if (objectNode.get("dst_addr").isNull()) {
+        if (!objectNode.has("dst_addr")) {
             return objectNode;
         }
 
