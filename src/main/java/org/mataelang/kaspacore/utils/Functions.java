@@ -31,7 +31,7 @@ public class Functions {
     public static DataStreamWriter<Row> aggregateStream(Dataset<Row> rowDataset, AggregationModel className) {
 
         String timeColumn = "seconds";
-        String windowStartColumnName = "seconds";
+        String windowStartColumnName = "@timestamp";
         StreamOutputInterface streamOutputInterface = new KafkaOutput(className.getTopic());
 
         if (Boolean.TRUE.equals(className.getDropRowIfNull())) {
