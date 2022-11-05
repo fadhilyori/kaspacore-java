@@ -6,14 +6,14 @@ public class AggrAlertInfo extends AggregationModel {
     public AggrAlertInfo() {
         fields = Arrays.asList(
                 "class",
+                "gid",
                 "msg",
                 "priority",
-                "gid",
-                "rev",
-                "sid",
-                "service",
                 "proto",
-                "sensor_id"
+                "rev",
+                "sensor_id",
+                "service",
+                "sid"
         );
         delayThreshold = "1 minute";
         windowDuration = "10 seconds";

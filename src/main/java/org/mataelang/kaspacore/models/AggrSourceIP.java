@@ -2,7 +2,7 @@ package org.mataelang.kaspacore.models;
 
 import java.util.Arrays;
 
-public class AggrSourceIP extends AggregationModel{
+public class AggrSourceIP extends AggregationModel {
     public AggrSourceIP() {
         fields = Arrays.asList(
                 "action",
@@ -11,8 +11,7 @@ public class AggrSourceIP extends AggregationModel{
                 "src_addr",
                 "src_country_code",
                 "src_country_name",
-                "src_lat",
-                "src_long",
+                "src_location",
                 "src_port"
         );
         delayThreshold = "1 minute";

@@ -56,16 +56,24 @@
       "metadata": {}
     },
     {
-      "name": "dst_long",
-      "type": "double",
+      "name": "dst_location",
+      "type": "struct",
       "nullable": true,
-      "metadata": {}
-    },
-    {
-      "name": "dst_lat",
-      "type": "double",
-      "nullable": true,
-      "metadata": {}
+      "metadata": {},
+      "fields": [
+        {
+          "name": "lat",
+          "type": "double",
+          "nullable": false,
+          "metadata": {}
+        },
+        {
+          "name": "lon",
+          "type": "double",
+          "nullable": false,
+          "metadata": {}
+        }
+      ]
     },
     {
       "name": "eth_dst",
@@ -212,16 +220,24 @@
       "metadata": {}
     },
     {
-      "name": "src_long",
-      "type": "double",
+      "name": "src_location",
+      "type": "struct",
       "nullable": true,
-      "metadata": {}
-    },
-    {
-      "name": "src_lat",
-      "type": "double",
-      "nullable": true,
-      "metadata": {}
+      "metadata": {},
+      "fields": [
+        {
+          "name": "lat",
+          "type": "double",
+          "nullable": false,
+          "metadata": {}
+        },
+        {
+          "name": "lon",
+          "type": "double",
+          "nullable": false,
+          "metadata": {}
+        }
+      ]
     },
     {
       "name": "tcp_ack",

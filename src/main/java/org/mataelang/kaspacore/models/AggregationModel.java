@@ -23,10 +23,6 @@ public class AggregationModel {
         return dropRowIfNull;
     }
 
-    public void setDropRowIfNull(Boolean dropRowIfNull) {
-        this.dropRowIfNull = dropRowIfNull;
-    }
-
     public List<String> getFields() {
         return fields;
     }

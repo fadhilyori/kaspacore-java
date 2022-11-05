@@ -9,8 +9,7 @@ public class AggrDestIP extends AggregationModel{
                 "dst_addr",
                 "dst_country_code",
                 "dst_country_name",
-                "dst_lat",
-                "dst_long",
+                "dst_location",
                 "dst_port",
                 "eth_dst",
                 "sensor_id"
