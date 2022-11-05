@@ -1,6 +1,7 @@
 package org.mataelang.kaspacore.utils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.hadoop.thirdparty.org.checkerframework.checker.units.qual.A;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -12,6 +13,7 @@ import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
 import org.mataelang.kaspacore.models.AggregationModel;
 import org.mataelang.kaspacore.outputs.KafkaOutput;
 import org.mataelang.kaspacore.outputs.StreamOutputInterface;
+import scala.collection.immutable.Seq;
 import scala.jdk.CollectionConverters;
 
 import java.io.File;
@@ -19,7 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,53 +35,38 @@ public class Functions {
         String timeColumn = "seconds";
         String windowStartColumnName = "@timestamp";
         StreamOutputInterface streamOutputInterface = new KafkaOutput(className.getTopic());
+        Column windowColumn = functions.window(rowDataset.col(timeColumn), className.getWindowDuration());
 
         if (Boolean.TRUE.equals(className.getDropRowIfNull())) {
-            rowDataset = rowDataset.na().drop(
-                    CollectionConverters.IteratorHasAsScala(
-                            className.getFields().iterator()
-                    ).asScala().toSeq()
-            );
+            Seq<String> allFields = getIterAsSeq(className.getFieldsIterator());
+            rowDataset = rowDataset.na().drop(allFields);
         }
+
+        Iterator<Column> columnIterator = addGetColumn(className.getFields(), windowColumn);
+
+        Seq<Column> aggrFields = getIterAsSeq(columnIterator);
 
         Dataset<Row> windowedCount = rowDataset
                 .withWatermark(timeColumn, className.getDelayThreshold())
-                .groupBy(
-                        CollectionConverters.IteratorHasAsScala(
-                                addGetColumn(
-                                        className.getFields(),
-                                        functions.window(
-                                                rowDataset.col(timeColumn),
-                                                className.getWindowDuration()
-                                        )
-                                ).iterator()
-                        ).asScala().toSeq()
-                ).count();
+                .groupBy(aggrFields)
+                .count();
 
-        Dataset<Row> selectedField = windowedCount.select(
-                CollectionConverters.IteratorHasAsScala(addGetColumn(
-                        className.getFields(),
-                        Arrays.asList(functions.col("window.start").alias(windowStartColumnName),
-                                functions.col("count")
-                        ))
-                        .iterator()).asScala().toSeq()
-        );
+        Dataset<Row> filteredDataSet = windowedCount
+                .withColumn(windowStartColumnName, windowedCount.col("window.start"))
+                .drop("window");
 
-        return streamOutputInterface.runStream(selectedField);
+        return streamOutputInterface.runStream(filteredDataSet);
     }
 
-    private static List<Column> addGetColumn(List<String> fields, Column newColumn) {
+    private static <T> Seq<T> getIterAsSeq(Iterator<T> columnIterator) {
+        return CollectionConverters.IteratorHasAsScala(columnIterator).asScala().toSeq();
+    }
+
+    private static Iterator<Column> addGetColumn(List<String> fields, Column newColumn) {
         List<Column> newFields = fields.stream().map(Column::new).collect(Collectors.toList());
         newFields.add(newColumn);
 
-        return newFields;
-    }
-
-    private static List<Column> addGetColumn(List<String> fields, List<Column> newColumn) {
-        List<Column> newFields = fields.stream().map(Column::new).collect(Collectors.toList());
-        newFields.addAll(newColumn);
-
-        return newFields;
+        return newFields.iterator();
     }
 
     public static StructType getSchemaFromFile() {
@@ -87,9 +74,7 @@ public class Functions {
         String content;
 
         try {
-            uri = Objects.requireNonNull(
-                    ClassLoader.getSystemClassLoader().getResource("event_schema.json")
-            ).toURI();
+            uri = Objects.requireNonNull(ClassLoader.getSystemClassLoader().getResource("event_schema.json")).toURI();
             content = FileUtils.readFileToString(new File(uri), StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
             throw new KaspaCoreRuntimeException(e);

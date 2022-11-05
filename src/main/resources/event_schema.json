@@ -57,23 +57,25 @@
     },
     {
       "name": "dst_location",
-      "type": "struct",
+      "type": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "lat",
+            "type": "double",
+            "nullable": false,
+            "metadata": {}
+          },
+          {
+            "name": "lon",
+            "type": "double",
+            "nullable": false,
+            "metadata": {}
+          }
+        ]
+      },
       "nullable": true,
-      "metadata": {},
-      "fields": [
-        {
-          "name": "lat",
-          "type": "double",
-          "nullable": false,
-          "metadata": {}
-        },
-        {
-          "name": "lon",
-          "type": "double",
-          "nullable": false,
-          "metadata": {}
-        }
-      ]
+      "metadata": {}
     },
     {
       "name": "eth_dst",
@@ -221,23 +223,25 @@
     },
     {
       "name": "src_location",
-      "type": "struct",
+      "type": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "lat",
+            "type": "double",
+            "nullable": false,
+            "metadata": {}
+          },
+          {
+            "name": "lon",
+            "type": "double",
+            "nullable": false,
+            "metadata": {}
+          }
+        ]
+      },
       "nullable": true,
-      "metadata": {},
-      "fields": [
-        {
-          "name": "lat",
-          "type": "double",
-          "nullable": false,
-          "metadata": {}
-        },
-        {
-          "name": "lon",
-          "type": "double",
-          "nullable": false,
-          "metadata": {}
-        }
-      ]
+      "metadata": {}
     },
     {
       "name": "tcp_ack",
