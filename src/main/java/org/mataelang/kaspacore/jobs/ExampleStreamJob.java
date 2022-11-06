@@ -1,4 +1,4 @@
-package org.mataelang.kaspacore;
+package org.mataelang.kaspacore.jobs;
 
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -17,11 +17,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-public class DataStreamPoC {
+public class ExampleStreamJob {
     /* Get actual class name to be printed on */
-    static Logger log = Logger.getLogger(DataStreamPoC.class);
+    static Logger log = Logger.getLogger(ExampleStreamJob.class);
     public static Properties loadConfig(String filename) throws IOException {
-        try (InputStream inputStream = DataStream.class.getClassLoader().getResourceAsStream(filename)) {
+        try (InputStream inputStream = SensorEnrichDataStreamJob.class.getClassLoader().getResourceAsStream(filename)) {
             Properties properties = new Properties();
 
             if (inputStream == null) {

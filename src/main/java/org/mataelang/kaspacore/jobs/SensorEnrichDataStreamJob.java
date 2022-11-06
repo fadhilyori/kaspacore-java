@@ -1,4 +1,4 @@
-package org.mataelang.kaspacore;
+package org.mataelang.kaspacore.jobs;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,9 +13,9 @@ import org.mataelang.kaspacore.providers.Spark;
 import org.mataelang.kaspacore.utils.IPLookupTool;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
-public class DataStream {
+public class SensorEnrichDataStreamJob {
     public static void main(String[] args) throws InterruptedException {
-        Logger.getLogger(DataStream.class).setLevel(
+        Logger.getLogger(SensorEnrichDataStreamJob.class).setLevel(
                 Level.toLevel(
                         PropertyManager.getProperty("LOG_LEVEL"),
                         Level.DEBUG

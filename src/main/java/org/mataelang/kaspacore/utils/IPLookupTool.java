@@ -2,17 +2,15 @@ package org.mataelang.kaspacore.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.model.CountryResponse;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
-import org.mataelang.kaspacore.DataStream;
 import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
+import org.mataelang.kaspacore.jobs.SensorEnrichDataStreamJob;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,11 +38,10 @@ public class IPLookupTool {
     private static File getFileFromResource(String filename) {
         URI maxmindDBFileUri;
         try {
-            maxmindDBFileUri = Objects.requireNonNull(DataStream.class
-                            .getClassLoader()
+            maxmindDBFileUri = Objects.requireNonNull(ClassLoader.getSystemClassLoader()
                             .getResource(filename))
                     .toURI();
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | NullPointerException e) {
             throw new KaspaCoreRuntimeException(e);
         }
 
@@ -117,7 +114,7 @@ public class IPLookupTool {
         } catch (IOException e) {
             throw new KaspaCoreRuntimeException(e);
         } catch (GeoIp2Exception e) {
-            Logger.getLogger(DataStream.class).debug(e);
+            Logger.getLogger(SensorEnrichDataStreamJob.class).debug(e);
             return null;
         }
 
@@ -139,7 +136,7 @@ public class IPLookupTool {
         } catch (IOException e) {
             throw new KaspaCoreRuntimeException(e);
         } catch (GeoIp2Exception e) {
-            Logger.getLogger(DataStream.class).debug(e);
+            Logger.getLogger(SensorEnrichDataStreamJob.class).debug(e);
             return null;
         }
 

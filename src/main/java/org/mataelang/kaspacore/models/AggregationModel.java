@@ -5,7 +5,6 @@ import scala.collection.immutable.Seq;
 import scala.jdk.CollectionConverters;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class AggregationModel {
@@ -37,10 +36,6 @@ public class AggregationModel {
 
     public List<String> getFields() {
         return fields;
-    }
-
-    public Iterator<String> getFieldsIterator() {
-        return fields.iterator();
     }
 
     public String getDelayThreshold() {

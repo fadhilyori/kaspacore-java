@@ -1,4 +1,4 @@
-package org.mataelang.kaspacore;
+package org.mataelang.kaspacore.jobs;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -10,7 +10,7 @@ import org.mataelang.kaspacore.providers.Spark;
 
 import static org.mataelang.kaspacore.utils.Functions.aggregateStream;
 
-public class Stream {
+public class SensorAggregationStreamJob {
     public static void main(String[] args) throws Exception {
         Dataset<Row> rowDataset = Spark.getSparkKafkaStreamParsed();
 
