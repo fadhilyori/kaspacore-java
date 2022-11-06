@@ -1,6 +1,9 @@
 package org.mataelang.kaspacore.models;
 
 import org.apache.spark.sql.Column;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.functions;
 import scala.collection.immutable.Seq;
 import scala.jdk.CollectionConverters;
 
@@ -15,8 +18,12 @@ public class AggregationModel {
     protected String windowDuration;
     protected String topic;
     protected Boolean dropRowIfNull;
+    protected String timeColumn;
+    protected String newTimeColumnName;
 
     public AggregationModel() {
+        timeColumn = "seconds";
+        newTimeColumnName = "@timestamp";
         fields = null;
         nullableFields = null;
         delayThreshold = "1 minute";
@@ -30,24 +37,12 @@ public class AggregationModel {
         this.columnList = getFieldAsColumn();
     }
 
-    public Boolean getDropRowIfNull() {
-        return dropRowIfNull;
-    }
-
-    public List<String> getFields() {
-        return fields;
-    }
-
-    public String getDelayThreshold() {
-        return delayThreshold;
-    }
-
-    public String getWindowDuration() {
-        return windowDuration;
-    }
-
     public String getTopic() {
         return topic;
+    }
+
+    private Column getWindowColumn() {
+        return functions.window(functions.col(timeColumn), windowDuration);
     }
 
     public void addColumn(Column column) {
@@ -72,5 +67,22 @@ public class AggregationModel {
 
     public Seq<String> getAsSeqString() {
         return CollectionConverters.IteratorHasAsScala(fields.iterator()).asScala().toSeq();
+    }
+
+    public Dataset<Row> aggregate(Dataset<Row> dataset) {
+        if (Boolean.TRUE.equals(dropRowIfNull)) {
+            dataset = dataset.na().drop(getAsSeqString());
+        }
+
+        addColumn(getWindowColumn());
+
+        Dataset<Row> aggrCountDataset = dataset
+                .withWatermark(timeColumn, delayThreshold)
+                .groupBy(getAsSeqColumn())
+                .count();
+
+        return aggrCountDataset
+                .withColumn(newTimeColumnName, aggrCountDataset.col("window.start"))
+                .drop("window");
     }
 }

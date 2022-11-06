@@ -5,8 +5,13 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
+import org.apache.spark.sql.streaming.DataStreamWriter;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.jetbrains.annotations.NotNull;
+import org.mataelang.kaspacore.models.AggregationModel;
+import org.mataelang.kaspacore.outputs.KafkaOutput;
+import org.mataelang.kaspacore.outputs.StreamOutputInterface;
 import org.mataelang.kaspacore.utils.Functions;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
@@ -66,5 +71,17 @@ public class Spark {
                 functions.col("parsed_value.*"),
                 functions.col("timestamp").as("event_arrived_time")
         );
+    }
+
+    /**
+     * @param model Model used to define the aggregation
+     * @return Return DataStreamWriter, required manually call `.start()` to start the stream
+     */
+    public static DataStreamWriter<Row> job(Dataset<Row> rowDataset, @NotNull AggregationModel model) {
+        StreamOutputInterface streamOutputInterface = new KafkaOutput(model.getTopic());
+
+        rowDataset = model.aggregate(rowDataset);
+
+        return streamOutputInterface.runStream(rowDataset);
     }
 }
