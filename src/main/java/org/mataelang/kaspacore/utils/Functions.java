@@ -1,7 +1,6 @@
 package org.mataelang.kaspacore.utils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.hadoop.thirdparty.org.checkerframework.checker.units.qual.A;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -13,42 +12,34 @@ import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
 import org.mataelang.kaspacore.models.AggregationModel;
 import org.mataelang.kaspacore.outputs.KafkaOutput;
 import org.mataelang.kaspacore.outputs.StreamOutputInterface;
-import scala.collection.immutable.Seq;
-import scala.jdk.CollectionConverters;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Functions {
     private Functions() {
     }
 
-    public static DataStreamWriter<Row> aggregateStream(Dataset<Row> rowDataset, AggregationModel className) {
+    public static DataStreamWriter<Row> aggregateStream(Dataset<Row> rowDataset, AggregationModel model) {
 
         String timeColumn = "seconds";
         String windowStartColumnName = "@timestamp";
-        StreamOutputInterface streamOutputInterface = new KafkaOutput(className.getTopic());
-        Column windowColumn = functions.window(rowDataset.col(timeColumn), className.getWindowDuration());
+        StreamOutputInterface streamOutputInterface = new KafkaOutput(model.getTopic());
+        Column windowColumn = functions.window(rowDataset.col(timeColumn), model.getWindowDuration());
 
-        if (Boolean.TRUE.equals(className.getDropRowIfNull())) {
-            Seq<String> allFields = getIterAsSeq(className.getFieldsIterator());
-            rowDataset = rowDataset.na().drop(allFields);
+        if (Boolean.TRUE.equals(model.getDropRowIfNull())) {
+            rowDataset = rowDataset.na().drop(model.getAsSeqString());
         }
 
-        Iterator<Column> columnIterator = addGetColumn(className.getFields(), windowColumn);
-
-        Seq<Column> aggrFields = getIterAsSeq(columnIterator);
+        model.addColumn(windowColumn);
 
         Dataset<Row> windowedCount = rowDataset
-                .withWatermark(timeColumn, className.getDelayThreshold())
-                .groupBy(aggrFields)
+                .withWatermark(timeColumn, model.getDelayThreshold())
+                .groupBy(model.getAsSeqColumn())
                 .count();
 
         Dataset<Row> filteredDataSet = windowedCount
@@ -56,17 +47,6 @@ public class Functions {
                 .drop("window");
 
         return streamOutputInterface.runStream(filteredDataSet);
-    }
-
-    private static <T> Seq<T> getIterAsSeq(Iterator<T> columnIterator) {
-        return CollectionConverters.IteratorHasAsScala(columnIterator).asScala().toSeq();
-    }
-
-    private static Iterator<Column> addGetColumn(List<String> fields, Column newColumn) {
-        List<Column> newFields = fields.stream().map(Column::new).collect(Collectors.toList());
-        newFields.add(newColumn);
-
-        return newFields.iterator();
     }
 
     public static StructType getSchemaFromFile() {
