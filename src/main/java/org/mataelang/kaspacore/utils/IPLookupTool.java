@@ -7,21 +7,16 @@ import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
-import io.netty.util.internal.ResourcesUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkFiles;
-import org.apache.spark.resource.ResourceUtils;
 import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
 import org.mataelang.kaspacore.jobs.SensorEnrichDataStreamJob;
-import org.mataelang.kaspacore.providers.Spark;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.util.Objects;
 
 public class IPLookupTool {
 
@@ -49,8 +44,8 @@ public class IPLookupTool {
             return objectNode;
         }
 
-        CityResponse srcAddrCountry = getInstance().getCountry(objectNode.get("src_addr").textValue());
-        CityResponse dstAddrCountry = getInstance().getCountry(objectNode.get("dst_addr").textValue());
+        CityResponse srcAddrCountry = getInstance().getCity(objectNode.get("src_addr").textValue());
+        CityResponse dstAddrCountry = getInstance().getCity(objectNode.get("dst_addr").textValue());
         ObjectMapper mapper = new ObjectMapper();
 
         if (srcAddrCountry != null) {
@@ -109,28 +104,6 @@ public class IPLookupTool {
         }
 
         return cityResponse;
-    }
-
-    public CityResponse getCountry(String ipAddress) {
-        InetAddress srcAddress;
-        try {
-            srcAddress = InetAddress.getByName(ipAddress);
-        } catch (UnknownHostException e) {
-            Logger.getLogger(this.getClass()).debug(e);
-            return null;
-        }
-
-        CityResponse countryResponse;
-        try {
-            countryResponse = IPLookupTool.getInstance().getReader().city(srcAddress);
-        } catch (IOException e) {
-            throw new KaspaCoreRuntimeException(e);
-        } catch (GeoIp2Exception e) {
-            Logger.getLogger(SensorEnrichDataStreamJob.class).debug(e);
-            return null;
-        }
-
-        return countryResponse;
     }
 
     public DatabaseReader getReader() {
