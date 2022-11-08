@@ -22,6 +22,8 @@ public class SensorEnrichDataStreamJob {
                 )
         );
 
+        Logger.getLogger(SensorEnrichDataStreamJob.class).info("Starting kaspacore enrichment service...");
+
         Consumer.getInstance().getStream(Spark.getStreamingContext()).foreachRDD(rdd -> {
             OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
 

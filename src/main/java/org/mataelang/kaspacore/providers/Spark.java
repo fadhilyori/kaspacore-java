@@ -37,6 +37,8 @@ public class Spark {
             streamingContext = new JavaStreamingContext(getSparkConf(), Durations.seconds(1));
         }
 
+        streamingContext.sparkContext().addFile(PropertyManager.getProperty("MAXMIND_DB_PATH"));
+
         return streamingContext;
     }
 

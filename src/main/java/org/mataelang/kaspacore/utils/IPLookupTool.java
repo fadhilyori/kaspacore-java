@@ -7,13 +7,16 @@ import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
+import io.netty.util.internal.ResourcesUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
+import org.apache.spark.SparkFiles;
+import org.apache.spark.resource.ResourceUtils;
 import org.mataelang.kaspacore.exceptions.KaspaCoreRuntimeException;
 import org.mataelang.kaspacore.jobs.SensorEnrichDataStreamJob;
+import org.mataelang.kaspacore.providers.Spark;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,25 +30,12 @@ public class IPLookupTool {
     private final DatabaseReader reader;
 
     public IPLookupTool() {
-        File maxmindDBFile = getFileFromResource(PropertyManager.getProperty("MAXMIND_DB_PATH"));
+        File maxmindDBFile = new File(SparkFiles.get(PropertyManager.getProperty("MAXMIND_DB_FILENAME")));
         try {
             this.reader = buildWithCache(maxmindDBFile);
         } catch (IOException e) {
             throw new KaspaCoreRuntimeException(e);
         }
-    }
-
-    private static File getFileFromResource(String filename) {
-        URI maxmindDBFileUri;
-        try {
-            maxmindDBFileUri = Objects.requireNonNull(ClassLoader.getSystemClassLoader()
-                            .getResource(filename))
-                    .toURI();
-        } catch (URISyntaxException | NullPointerException e) {
-            throw new KaspaCoreRuntimeException(e);
-        }
-
-        return new File(maxmindDBFileUri);
     }
 
     public static ObjectNode ipEnrichmentFunc(ConsumerRecord<String, JsonNode> messageNode) {
