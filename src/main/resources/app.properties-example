@@ -9,7 +9,8 @@ KAFKA_INPUT_VALUE_DESERIALIZER=io.confluent.kafka.serializers.KafkaJsonDeseriali
 KAFKA_GROUP_ID=me_kaspa_core
 KAFKA_INPUT_STARTING_OFFSETS=latest
 SENSOR_STREAM_INPUT_TOPIC=sensor_events
-MAXMIND_DB_PATH=GeoLite2-City.mmdb
+MAXMIND_DB_PATH=file:///path/to/GeoLite2-City.mmdb
+MAXMIND_DB_FILENAME=GeoLite2-City.mmdb
 
 SENSOR_STREAM_OUTPUT_TOPIC=sensor_events_with_geoip
 KAFKA_OUTPUT_ACKS=all
