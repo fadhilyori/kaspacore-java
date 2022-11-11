@@ -1,9 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SensorAggregationStreamJob" type="Application" factoryName="Application">
-    <option name="ALTERNATIVE_JRE_PATH" value="BUNDLED" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+  <configuration default="false" name="SparkAvroReader" type="Application" factoryName="Application">
     <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
-    <option name="MAIN_CLASS_NAME" value="org.mataelang.kaspacore.jobs.SensorAggregationStreamJob" />
+    <option name="MAIN_CLASS_NAME" value="org.mataelang.kaspacore.jobs.SparkAvroReader" />
     <module name="kaspacore" />
     <option name="VM_PARAMETERS" value="--add-exports=java.base/sun.nio.ch=ALL-UNNAMED" />
     <method v="2">

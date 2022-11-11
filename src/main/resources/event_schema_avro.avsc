@@ -1,0 +1,209 @@
+{
+  "type": "record",
+  "name": "SensorEvent",
+  "namespace": "org.mataelang.kaspacore.avro",
+  "fields": [
+    {
+      "name": "seconds",
+      "type": "long"
+    },
+    {
+      "name": "action",
+      "type": "string"
+    },
+    {
+      "name": "class",
+      "type": "string"
+    },
+    {
+      "name": "dir",
+      "type": "string"
+    },
+    {
+      "name": "dst_addr",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "dst_ap",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "dst_port",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "dst_country_code",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "dst_country_name",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "dst_location",
+      "type": {
+        "type": "record",
+        "name": "location_dst",
+        "fields": [
+          {
+            "name": "lat",
+            "type": ["null", "double"]
+          },
+          {
+            "name": "lon",
+            "type": ["null", "double"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "eth_dst",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "eth_len",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "eth_src",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "eth_type",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "gid",
+      "type": "int"
+    },
+    {
+      "name": "iface",
+      "type": "string"
+    },
+    {
+      "name": "ip_id",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "ip_len",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "msg",
+      "type": "string"
+    },
+    {
+      "name": "mpls",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "pkt_gen",
+      "type": "string"
+    },
+    {
+      "name": "pkt_len",
+      "type": "int"
+    },
+    {
+      "name": "pkt_num",
+      "type": "int"
+    },
+    {
+      "name": "priority",
+      "type": "int"
+    },
+    {
+      "name": "proto",
+      "type": "string"
+    },
+    {
+      "name": "rev",
+      "type": "int"
+    },
+    {
+      "name": "rule",
+      "type": "string"
+    },
+    {
+      "name": "service",
+      "type": "string"
+    },
+    {
+      "name": "sid",
+      "type": "int"
+    },
+    {
+      "name": "src_addr",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "src_ap",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "src_port",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "src_country_code",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "src_country_name",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "src_location",
+      "type": {
+        "type": "record",
+        "name": "location_src",
+        "fields": [
+          {
+            "name": "lat",
+            "type": ["null", "double"]
+          },
+          {
+            "name": "lon",
+            "type": ["null", "double"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "tcp_ack",
+      "type": ["null", "long"]
+    },
+    {
+      "name": "tcp_flags",
+      "type": ["null", "string"]
+    },
+    {
+      "name": "tcp_len",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "tcp_seq",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "tcp_win",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "tos",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "ttl",
+      "type": ["null", "int"]
+    },
+    {
+      "name": "vlan",
+      "type": "int"
+    },
+    {
+      "name": "sensor_id",
+      "type": "string"
+    }
+  ]
+}

@@ -1,11 +1,13 @@
 package org.mataelang.kaspacore.providers;
 
+import org.apache.avro.Schema;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.streaming.DataStreamWriter;
+import static org.apache.spark.sql.avro.functions.*;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.jetbrains.annotations.NotNull;
@@ -67,6 +69,19 @@ public class Spark {
                 functions.from_json(
                         functions.col("value").cast("string"),
                         Functions.getSchemaFromFile()
+                ).alias("parsed_value"),
+                functions.col("timestamp")
+        ).select(
+                functions.col("parsed_value.*"),
+                functions.col("timestamp").as("event_arrived_time")
+        );
+    }
+
+    public static Dataset<Row> getSparkKafkaStreamParsedAvro() {
+        return Spark.getSparkKafkaStream().select(
+                from_avro(
+                        functions.col("value"),
+                        Functions.getAvroSchemaFromFile()
                 ).alias("parsed_value"),
                 functions.col("timestamp")
         ).select(

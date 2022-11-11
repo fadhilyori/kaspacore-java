@@ -13,6 +13,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="kaspacore" target="17" />
       <module name="kaspacore-java" target="11" />
     </bytecodeTargetLevel>
   </component>

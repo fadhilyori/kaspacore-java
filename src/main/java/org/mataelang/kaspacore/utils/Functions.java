@@ -29,4 +29,18 @@ public class Functions {
 
         return (StructType) DataType.fromJson(content);
     }
+
+    public static String getAvroSchemaFromFile() {
+        URI uri;
+        String content;
+
+        try {
+            uri = Objects.requireNonNull(ClassLoader.getSystemClassLoader().getResource("event_schema_avro.avsc")).toURI();
+            content = FileUtils.readFileToString(new File(uri), StandardCharsets.UTF_8);
+        } catch (IOException | URISyntaxException e) {
+            throw new KaspaCoreRuntimeException(e);
+        }
+
+        return content;
+    }
 }
