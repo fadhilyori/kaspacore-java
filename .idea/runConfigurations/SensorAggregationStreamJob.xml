@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SensorAggregationStreamJob" type="Application" factoryName="Application">
+  <configuration default="false" name="SensorAggregationStreamJob" type="Application" factoryName="Application" show_console_on_std_err="true" show_console_on_std_out="true">
     <option name="ALTERNATIVE_JRE_PATH" value="BUNDLED" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
     <option name="MAIN_CLASS_NAME" value="org.mataelang.kaspacore.jobs.SensorAggregationStreamJob" />
-    <module name="kaspacore" />
+    <module name="kaspacore-java" />
     <option name="VM_PARAMETERS" value="--add-exports=java.base/sun.nio.ch=ALL-UNNAMED" />
     <method v="2">
       <option name="Make" enabled="true" />

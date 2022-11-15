@@ -10,6 +10,7 @@ import scala.jdk.CollectionConverters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AggregationModel {
     protected List<String> fields;
