@@ -8,13 +8,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="kaspacore" />
-        <module name="kaspa-core-system-java" />
-        <module name="kaspacore-java" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="kaspacore" target="17" />
-      <module name="kaspacore-java" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

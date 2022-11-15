@@ -1,13 +1,11 @@
 package org.mataelang.kaspacore.providers;
 
-import org.apache.avro.Schema;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.streaming.DataStreamWriter;
-import static org.apache.spark.sql.avro.functions.*;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.jetbrains.annotations.NotNull;
