@@ -7,6 +7,7 @@ import org.apache.spark.sql.functions;
 import scala.collection.immutable.Seq;
 import scala.jdk.CollectionConverters;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,8 +55,12 @@ public class AggregationModel {
     }
 
     public List<Column> getFieldAsColumn() {
+        ArrayList<Column> arr = new ArrayList<>();
+
         if (fields != null) {
-            return fields.stream().map(Column::new).toList();
+            List<Column> list = fields.stream().map(Column::new).toList();
+            arr.addAll(list);
+            return arr;
         }
 
         return Collections.emptyList();

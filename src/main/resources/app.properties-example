@@ -11,6 +11,7 @@ KAFKA_INPUT_STARTING_OFFSETS=latest
 SENSOR_STREAM_INPUT_TOPIC=sensor_events
 MAXMIND_DB_PATH=file:///path/to/GeoLite2-City.mmdb
 MAXMIND_DB_FILENAME=GeoLite2-City.mmdb
+AVRO_SCHEMA_FILEPATH=event_schema_avro.avsc
 
 SENSOR_STREAM_OUTPUT_TOPIC=sensor_events_with_geoip
 KAFKA_OUTPUT_ACKS=all
