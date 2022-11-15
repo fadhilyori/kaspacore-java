@@ -44,6 +44,7 @@ public class SensorEnrichDataStreamJob {
             });
 
             ((CanCommitOffsets) Consumer.getInstance().getStream(Spark.getStreamingContext()).inputDStream()).commitAsync(offsetRanges);
+            Logger.getLogger(SensorEnrichDataStreamJob.class).info("iteration finished");
         });
 
         Spark.getStreamingContext().start();
