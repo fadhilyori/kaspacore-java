@@ -55,12 +55,8 @@ public class AggregationModel {
     }
 
     public List<Column> getFieldAsColumn() {
-        ArrayList<Column> arr = new ArrayList<>();
-
         if (fields != null) {
-            List<Column> list = fields.stream().map(Column::new).toList();
-            arr.addAll(list);
-            return arr;
+            return fields.stream().map(Column::new).collect(Collectors.toCollection(ArrayList<Column>::new));
         }
 
         return Collections.emptyList();
