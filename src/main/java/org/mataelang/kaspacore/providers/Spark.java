@@ -77,19 +77,6 @@ public class Spark {
         );
     }
 
-    public static Dataset<Row> getSparkKafkaStreamParsedAvro() {
-        return Spark.getSparkKafkaStream().select(
-                from_avro(
-                        functions.col("value"),
-                        Functions.getAvroSchemaFromFile()
-                ).alias("parsed_value"),
-                functions.col("timestamp")
-        ).select(
-                functions.col("parsed_value.*"),
-                functions.col("timestamp").as("event_arrived_time")
-        );
-    }
-
     /**
      * @param model Model used to define the aggregation
      * @return Return DataStreamWriter, required manually call `.start()` to start the stream
