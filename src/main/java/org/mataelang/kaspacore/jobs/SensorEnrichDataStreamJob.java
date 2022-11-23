@@ -4,6 +4,7 @@ package org.mataelang.kaspacore.jobs;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka010.CanCommitOffsets;
 import org.apache.spark.streaming.kafka010.HasOffsetRanges;
 import org.apache.spark.streaming.kafka010.OffsetRange;
@@ -22,15 +23,17 @@ public class SensorEnrichDataStreamJob {
                 )
         );
 
+        String appName = "SensorEnrichmentStream";
+
+        JavaStreamingContext streamingContext = Spark.getStreamingContext(appName);
+
         Logger.getLogger(SensorEnrichDataStreamJob.class).info("Starting kaspacore enrichment service...");
 
-        Consumer.getInstance().getStream(Spark.getStreamingContext()).foreachRDD(rdd -> {
+        Consumer.getInstance().getStream(streamingContext).foreachRDD(rdd -> {
             OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
 
             rdd.foreachPartition(recordIterator -> {
                 Producer.getInstance().connect();
-
-//                OffsetRange o = offsetRanges[TaskContext.get().partitionId()];
 
                 // send to kafka
                 recordIterator.forEachRemaining(message -> {
@@ -43,11 +46,11 @@ public class SensorEnrichDataStreamJob {
                 Producer.getInstance().close();
             });
 
-            ((CanCommitOffsets) Consumer.getInstance().getStream(Spark.getStreamingContext()).inputDStream()).commitAsync(offsetRanges);
+            ((CanCommitOffsets) Consumer.getInstance().getStream(streamingContext).inputDStream()).commitAsync(offsetRanges);
             Logger.getLogger(SensorEnrichDataStreamJob.class).info("iteration finished");
         });
 
-        Spark.getStreamingContext().start();
-        Spark.getStreamingContext().awaitTermination();
+        streamingContext.start();
+        streamingContext.awaitTermination();
     }
 }
