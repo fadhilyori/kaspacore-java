@@ -10,7 +10,7 @@ public class KafkaOutput extends StreamOutput {
         setOption("kafka.bootstrap.servers", PropertyManager.getProperty("KAFKA_BOOTSTRAP_SERVERS"));
         setFormat("kafka");
         setOption("topic", topic);
-        setOutputMode("update");
+        setOutputMode("complete");
     }
 
     @Override

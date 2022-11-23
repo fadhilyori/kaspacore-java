@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.mataelang.kaspacore.models.AggregationModel;
 import org.mataelang.kaspacore.outputs.KafkaOutput;
 import org.mataelang.kaspacore.outputs.StreamOutputInterface;
-import org.mataelang.kaspacore.utils.Functions;
+import org.mataelang.kaspacore.schemas.EventSchema;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
 public class Spark {
@@ -21,9 +21,9 @@ public class Spark {
     private Spark() {
     }
 
-    private static SparkConf getSparkConf() {
+    private static SparkConf getSparkConf(String appName) {
         SparkConf sparkConf = new SparkConf();
-        sparkConf.setAppName(PropertyManager.getProperty("SPARK_APP_NAME"));
+        sparkConf.setAppName(appName);
         sparkConf.setMaster(PropertyManager.getProperty("SPARK_MASTER"));
         sparkConf.set("spark.sql.streaming.checkpointLocation", PropertyManager.getProperty("SPARK_CHECKPOINT_PATH"));
         sparkConf.set("spark.sql.session.timeZone", PropertyManager.getProperty("TIMEZONE", "UTC"));
@@ -32,9 +32,9 @@ public class Spark {
         return sparkConf;
     }
 
-    public static JavaStreamingContext getStreamingContext() {
+    public static JavaStreamingContext getStreamingContext(String appName) {
         if (streamingContext == null) {
-            streamingContext = new JavaStreamingContext(getSparkConf(), Durations.seconds(1));
+            streamingContext = new JavaStreamingContext(getSparkConf(appName), Durations.seconds(1));
         }
 
         streamingContext.sparkContext().addFile(PropertyManager.getProperty("MAXMIND_DB_PATH"));
@@ -42,18 +42,14 @@ public class Spark {
         return streamingContext;
     }
 
-    public static SparkSession getSparkSession() {
+    public static SparkSession getSparkSession(String appName) {
         return SparkSession
                 .builder()
-                .config(getSparkConf())
+                .config(getSparkConf(appName))
                 .getOrCreate();
     }
 
-    public static Dataset<Row> getSparkKafkaStream() {
-        return Spark.getSparkKafkaStream(Spark.getSparkSession());
-    }
-
-    public static Dataset<Row> getSparkKafkaStream(SparkSession sparkSession) {
+    public static Dataset<Row> getKafkaStreamDataset(SparkSession sparkSession) {
         return sparkSession.readStream()
                 .format("kafka")
                 .option("kafka.bootstrap.servers", PropertyManager.getProperty("KAFKA_BOOTSTRAP_SERVERS"))
@@ -62,11 +58,11 @@ public class Spark {
                 .load();
     }
 
-    public static Dataset<Row> getSparkKafkaStreamParsed() {
-        return Spark.getSparkKafkaStream().select(
+    public static Dataset<Row> getParsedDataset(SparkSession sparkSession) {
+        return Spark.getKafkaStreamDataset(sparkSession).select(
                 functions.from_json(
                         functions.col("value").cast("string"),
-                        Functions.getSchemaFromFile()
+                        EventSchema.getSchema()
                 ).alias("parsed_value"),
                 functions.col("timestamp")
         ).select(
