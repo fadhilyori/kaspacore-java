@@ -2,7 +2,7 @@ package org.mataelang.kaspacore.outputs;
 
 public class ConsoleOutput extends StreamOutput {
     public ConsoleOutput() {
-        configure("complete", false);
+        configure("append", false);
     }
 
     public ConsoleOutput(String outputMode) {

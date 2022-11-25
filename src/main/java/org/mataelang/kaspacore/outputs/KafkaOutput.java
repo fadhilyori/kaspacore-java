@@ -10,11 +10,11 @@ public class KafkaOutput extends StreamOutput {
         setOption("kafka.bootstrap.servers", PropertyManager.getProperty("KAFKA_BOOTSTRAP_SERVERS"));
         setFormat("kafka");
         setOption("topic", topic);
-        setOutputMode("complete");
+        setOutputMode("append");
     }
 
     @Override
     public DataStreamWriter<Row> runStream(Dataset<Row> rowDataset) {
-        return super.runStream(rowDataset.selectExpr("to_json(struct(*)) AS value"));
+        return super.runStream(rowDataset.selectExpr("to_json(struct(sensor_id)) to_json(struct(*)) AS value"));
     }
 }
