@@ -14,7 +14,7 @@ public class AggrDestIP extends AggregationModel{
                 "eth_dst",
                 "sensor_id"
         );
-        delayThreshold = "1 minute";
+        delayThreshold = "5 seconds";
         windowDuration = "10 seconds";
         topic = "destination_ip_address_10s";
     }

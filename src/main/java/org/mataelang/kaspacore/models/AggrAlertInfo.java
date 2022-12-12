@@ -15,7 +15,7 @@ public class AggrAlertInfo extends AggregationModel {
                 "service",
                 "sid"
         );
-        delayThreshold = "1 minute";
+        delayThreshold = "5 seconds";
         windowDuration = "10 seconds";
         topic = "alert_information_10s";
     }

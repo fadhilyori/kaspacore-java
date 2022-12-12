@@ -14,7 +14,7 @@ public class AggrSourceIP extends AggregationModel {
                 "src_location",
                 "src_port"
         );
-        delayThreshold = "1 minute";
+        delayThreshold = "5 seconds";
         windowDuration = "10 seconds";
         topic = "source_ip_address_10s";
     }

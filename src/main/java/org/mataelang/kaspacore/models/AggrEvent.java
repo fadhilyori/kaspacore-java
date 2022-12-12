@@ -6,6 +6,7 @@ public class AggrEvent extends AggregationModel {
     public AggrEvent() {
         fields = Arrays.asList(
                 "action",
+                "b64_data",
                 "class",
                 "dir",
                 "dst_addr",
@@ -47,7 +48,7 @@ public class AggrEvent extends AggregationModel {
                 "ttl",
                 "vlan"
         );
-        delayThreshold = "1 minute";
+        delayThreshold = "5 seconds";
         windowDuration = "10 seconds";
         topic = "event_all_10s";
         dropRowIfNull = false;
