@@ -1,21 +1,14 @@
-SPARK_APP_NAME=KaspaCore
 SPARK_MASTER=local[*]
 SPARK_CHECKPOINT_PATH=/tmp/kaspacore/checkpoint
 TIMEZONE=UTC
 
 KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092
-KAFKA_INPUT_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
-KAFKA_INPUT_VALUE_DESERIALIZER=io.confluent.kafka.serializers.KafkaJsonDeserializer
-KAFKA_GROUP_ID=me_kaspa_core
 KAFKA_INPUT_STARTING_OFFSETS=latest
+
 SENSOR_STREAM_INPUT_TOPIC=sensor_events
+SENSOR_STREAM_OUTPUT_TOPIC=sensor_events_with_geoip
+
 MAXMIND_DB_PATH=file:///path/to/GeoLite2-City.mmdb
 MAXMIND_DB_FILENAME=GeoLite2-City.mmdb
-
-SENSOR_STREAM_OUTPUT_TOPIC=sensor_events_with_geoip
-KAFKA_OUTPUT_ACKS=all
-KAFKA_OUTPUT_RETRIES=0
-KAFKA_INPUT_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
-KAFKA_INPUT_VALUE_SERIALIZER=io.confluent.kafka.serializers.KafkaJsonSerializer
 
 LOG_LEVEL=DEBUG

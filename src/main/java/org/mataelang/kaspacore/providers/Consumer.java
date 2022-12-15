@@ -19,7 +19,7 @@ public class Consumer extends KafkaProvider {
 
     public Consumer() {
         setConfig("bootstrap.servers", "KAFKA_BOOTSTRAP_SERVERS");
-        setConfig("group.id", "KAFKA_GROUP_ID");
+        setConfig("group.id", "KAFKA_GROUP_ID", "me_kaspacore");
         setConfig("auto.offset.reset", "KAFKA_INPUT_STARTING_OFFSETS");
         setConfig("key.deserializer", "KAFKA_INPUT_KEY_DESERIALIZER", "org.apache.kafka.common.serialization.StringDeserializer");
         setConfig("value.deserializer", "KAFKA_INPUT_VALUE_DESERIALIZER", "io.confluent.kafka.serializers.KafkaJsonDeserializer");

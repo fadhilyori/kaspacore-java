@@ -12,8 +12,8 @@ public class Producer extends KafkaProvider {
 
     public Producer() {
         setConfig("bootstrap.servers", "KAFKA_BOOTSTRAP_SERVERS");
-        setConfig("acks", "KAFKA_OUTPUT_ACKS");
-        setConfig("retries", "KAFKA_OUTPUT_RETRIES");
+        setConfig("acks", "KAFKA_OUTPUT_ACKS", "all");
+        setConfig("retries", "KAFKA_OUTPUT_RETRIES", "0");
         setConfig("key.serializer", "KAFKA_INPUT_KEY_SERIALIZER", "org.apache.kafka.common.serialization.StringSerializer");
         setConfig("value.serializer", "KAFKA_INPUT_VALUE_SERIALIZER", "io.confluent.kafka.serializers.KafkaJsonSerializer");
     }

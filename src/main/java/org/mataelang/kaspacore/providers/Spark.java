@@ -24,7 +24,7 @@ public class Spark {
     private static SparkConf getSparkConf(String appName) {
         SparkConf sparkConf = new SparkConf();
         sparkConf.setAppName(appName);
-        sparkConf.setMaster(PropertyManager.getProperty("SPARK_MASTER"));
+        sparkConf.setMaster(PropertyManager.getProperty("SPARK_MASTER", "local[*]"));
         sparkConf.set("spark.sql.streaming.checkpointLocation", PropertyManager.getProperty("SPARK_CHECKPOINT_PATH"));
         sparkConf.set("spark.sql.session.timeZone", PropertyManager.getProperty("TIMEZONE", "UTC"));
         sparkConf.validateSettings();
