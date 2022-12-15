@@ -1,7 +1,7 @@
 # Kaspacore Java
 
 ## Requirements
- - Spark min 3.2.2
+ - Spark min 3.3.1
  - Scala 2.13
  - openJDK min 11
  - Maven
@@ -15,4 +15,4 @@ jar` to deploy it to Spark.
 
 ## Submit the App to Spark
 
-[//]: # (TODO: Add step-by-step to submit the Applications to Spark)
+You can submit App using `spark-submit` command.
