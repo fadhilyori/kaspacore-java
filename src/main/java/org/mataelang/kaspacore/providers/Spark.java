@@ -53,7 +53,7 @@ public class Spark {
         return sparkSession.readStream()
                 .format("kafka")
                 .option("kafka.bootstrap.servers", PropertyManager.getProperty("KAFKA_BOOTSTRAP_SERVERS"))
-                .option("startingOffsets", PropertyManager.getProperty("KAFKA_INPUT_STARTING_OFFSETS", "latest"))
+                .option("startingOffsets", PropertyManager.getProperty("KAFKA_INPUT_STARTING_OFFSETS", "earliest"))
                 .option("subscribe", PropertyManager.getProperty("SENSOR_STREAM_OUTPUT_TOPIC"))
                 .load();
     }
