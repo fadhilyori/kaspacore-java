@@ -31,6 +31,7 @@ public class AggrEvent extends AggregationModel {
                 "proto",
                 "rev",
                 "rule",
+                "reference",
                 "sensor_id",
                 "service",
                 "sid",

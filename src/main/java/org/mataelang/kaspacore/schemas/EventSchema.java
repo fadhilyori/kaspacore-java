@@ -70,6 +70,7 @@ public class EventSchema {
                 new StructField("tcp_seq", DataTypes.IntegerType, true, Metadata.empty()),
                 new StructField("tcp_win", DataTypes.IntegerType, true, Metadata.empty()),
                 new StructField("timestamp", DataTypes.TimestampType, true, Metadata.empty()),
+                new StructField("reference", DataTypes.StringType, true, Metadata.empty()),
                 new StructField("tos", DataTypes.IntegerType, true, Metadata.empty()),
                 new StructField("ttl", DataTypes.IntegerType, true, Metadata.empty()),
                 new StructField("udp_len", DataTypes.IntegerType, true, Metadata.empty()),
