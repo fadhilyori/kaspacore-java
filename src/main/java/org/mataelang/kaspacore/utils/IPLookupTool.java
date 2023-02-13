@@ -36,6 +36,16 @@ public class IPLookupTool {
     public static ObjectNode ipEnrichmentFunc(ConsumerRecord<String, JsonNode> messageNode) {
         ObjectNode objectNode = messageNode.value().deepCopy();
 
+        if (!objectNode.has("rule")) {
+            return objectNode;
+        }
+
+        String url = "https://www.snort.org/rule_docs/";
+        String rule = objectNode.has("rule") ? objectNode.get("rule").textValue() : "";
+        String[] parts = rule.split(":");
+        String reference = url + parts[0] + "-" + parts[1];
+        objectNode.put("reference", reference);
+
         if (!objectNode.has("src_addr")) {
             return objectNode;
         }
@@ -44,8 +54,10 @@ public class IPLookupTool {
             return objectNode;
         }
 
+
         CityResponse srcAddrCountry = getInstance().getCity(objectNode.get("src_addr").textValue());
         CityResponse dstAddrCountry = getInstance().getCity(objectNode.get("dst_addr").textValue());
+
         ObjectMapper mapper = new ObjectMapper();
 
         if (srcAddrCountry != null) {

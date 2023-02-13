@@ -11,6 +11,7 @@ public class AggrAlertInfo extends AggregationModel {
                 "priority",
                 "proto",
                 "rev",
+                "reference",
                 "sensor_id",
                 "service",
                 "sid"
