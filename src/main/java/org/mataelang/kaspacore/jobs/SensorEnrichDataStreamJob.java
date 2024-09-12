@@ -15,6 +15,7 @@ import org.mataelang.kaspacore.utils.IPLookupTool;
 import org.mataelang.kaspacore.utils.PropertyManager;
 
 public class SensorEnrichDataStreamJob {
+    @SuppressWarnings("deprecation")
     public static void main(String[] args) throws InterruptedException {
         Logger.getLogger(SensorEnrichDataStreamJob.class).setLevel(
                 Level.toLevel(
